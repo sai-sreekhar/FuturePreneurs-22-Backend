@@ -1,0 +1,32 @@
+{
+  "name": "auth-team-logic",
+  "version": "1.0.0",
+  "description": "Practicing auth and team creation logic",
+  "main": "server.js",
+  "scripts": {
+    "start": "forever start --minUptime 1000 --spinSleepTime 1000 server.js",
+    "start1": "node server.js",
+    "stop": "forever stop server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecellvit/Auth-Team-Logic.git"
+  },
+  "author": "PalanikannanM",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ecellvit/Auth-Team-Logic/issues"
+  },
+  "homepage": "https://github.com/ecellvit/Auth-Team-Logic#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "google-auth-library": "^8.1.1",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.4.7"
+  }
+}
