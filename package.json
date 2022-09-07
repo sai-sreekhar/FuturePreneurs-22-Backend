@@ -27,6 +27,7 @@
     "google-auth-library": "^8.1.1",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.4.7"
+    "mongoose": "^6.4.7",
+    "morgan": "^1.10.0"
   }
 }
