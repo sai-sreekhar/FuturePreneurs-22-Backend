@@ -4,7 +4,7 @@ const sendErrorDevEnv = (err, res) => {
   res.status(err.statusCode).json({
     errorCode: err.errorCode,
     message: err.message,
-    stack: err.exceptionTrace.stack,
+    // stack: err.exceptionTrace.stack,
   });
 };
 
