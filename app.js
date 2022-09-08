@@ -3,11 +3,19 @@ const cors = require("cors");
 const errorController = require("./controllers/errorController");
 const { errorCodes } = require("./utils/constants");
 const AppError = require("./utils/appError");
+const morgan = require("morgan");
 
 const app = express();
 app.use(express.json());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+app.use(morgan("dev"));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));
