@@ -102,7 +102,7 @@ exports.getRequest = catchAsync(async (req, res, next) => {
     userId: req.user._id,
   }).populate({
     path: "teamId",
-    populate: { path: "members", select: "name email mobileNumber" },
+    populate: { path: "members", select: "name email mobileNumber teamRole" },
   });
 
   res.status(200).json({
