@@ -47,7 +47,11 @@ app.use(function (req, res, next) {
 //   })
 // );
 
-app.use(morgan("dev"));
+morgan.token('req-headers', function(req,res){
+  return JSON.stringify(req.headers)
+ })
+ 
+ process.env.NODE_ENV != 'production' && app.use(morgan(':method :url :status :req-headers'));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));
