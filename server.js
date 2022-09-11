@@ -9,7 +9,7 @@ console.log(path.resolve(__dirname, "./.env"));
 
 mongoose.connect(
   process.env.DB_CONNECTION,
-  { useNewUrlParser: true, maxPoolSize: 30, minPoolSize: 10 },
+  { useNewUrlParser: true, maxPoolSize: 200, minPoolSize: 100 },
   () => {
     console.log("Connected to DataBase");
   }
