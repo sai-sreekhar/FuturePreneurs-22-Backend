@@ -517,12 +517,14 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 exports.getAllTeams = catchAsync(async (req, res, next) => {
   const startTime = Date.now();
 
-  const teams = await Team.find().populate("members", {
-    name: 1,
-    teamRole: 1,
-    email: 1,
-    mobileNumber: 1,
-  });
+  // const teams = await Team.find().populate("members", {
+  //   name: 1,
+  //   teamRole: 1,
+  //   email: 1,
+  //   mobileNumber: 1,
+  // });
+
+  const teams = { name: "hello" };
 
   const endTime = Date.now();
   console.log("Time Taken = ", endTime - startTime);
