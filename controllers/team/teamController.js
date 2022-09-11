@@ -515,6 +515,8 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllTeams = catchAsync(async (req, res, next) => {
+  const startTime = Date.now();
+
   const teams = await Team.find().populate("members", {
     name: 1,
     teamRole: 1,
@@ -522,6 +524,8 @@ exports.getAllTeams = catchAsync(async (req, res, next) => {
     mobileNumber: 1,
   });
 
+  const endTime = Date.now();
+  console.log("Time Taken = ", endTime - startTime);
   res.status(201).json({
     message: "Get all teams successfull",
     teams,
