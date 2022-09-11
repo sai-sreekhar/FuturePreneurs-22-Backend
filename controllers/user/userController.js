@@ -100,6 +100,7 @@ exports.getRequest = catchAsync(async (req, res, next) => {
 
   const requests = await PendingApprovalsModel.find({
     userId: req.user._id,
+    status: requestStatusTypes.PENDING_APPROVAL,
   }).populate({
     path: "teamId",
     populate: { path: "members", select: "name email mobileNumber teamRole" },
@@ -378,7 +379,7 @@ exports.getTeam = catchAsync(async (req, res, next) => {
     populate: {
       path: "members",
       model: "Users",
-      select: { name: 1, mobileNumber: 1, email: 1, _id: 0 },
+      select: { name: 1, mobileNumber: 1, email: 1, _id: 1, teamRole: 1 },
     },
   });
 

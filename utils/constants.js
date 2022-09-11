@@ -55,8 +55,7 @@ const errorCodes = {
 
 const objectIdLength = 24;
 const noOfQuestionsToAnswer = 15;
-const totalNumberOfQuestions = 25;
-const quizId = "631b2e2458a9b2005b692e86";
+const quizId = "631dd7972e4ee9fda84c1538";
 
 module.exports = {
   loginType,
@@ -66,6 +65,5 @@ module.exports = {
   errorCodes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  totalNumberOfQuestions,
   quizId,
 };

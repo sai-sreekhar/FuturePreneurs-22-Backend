@@ -11,7 +11,6 @@ const {
   approvalStatusTypes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  totalNumberOfQuestions,
   quizId,
 } = require("../../utils/constants");
 const {
@@ -515,6 +514,8 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllTeams = catchAsync(async (req, res, next) => {
+  const startTime = Date.now();
+
   const teams = await Team.find().populate("members", {
     name: 1,
     teamRole: 1,
@@ -522,6 +523,8 @@ exports.getAllTeams = catchAsync(async (req, res, next) => {
     mobileNumber: 1,
   });
 
+  const endTime = Date.now();
+  console.log("Time Taken = ", endTime - startTime);
   res.status(201).json({
     message: "Get all teams successfull",
     teams,
@@ -617,27 +620,31 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
   const quizModel = await QuizModel.findById({ _id: quizId });
-  let questionIdx = Math.floor(
-    Math.random() * (totalNumberOfQuestions - 1) - 0 + 1
-  );
 
+  const totalQuestions = quizModel.questionIds.length;
+  let questionIdx = Math.floor(Math.random() * totalQuestions);
+  let curQuestionId = quizModel.questionIds[questionIdx];
+  
+  let idxCount = 0;
   while (
-    !quizModel.questionIds.includes(questionIdx) ||
-    team.completedQuestions.includes(questionIdx)
+    team.completedQuestions.includes(curQuestionId) &&
+    idxCount <= totalQuestions
   ) {
-    questionIdx = Math.floor(
-      Math.random() * (totalNumberOfQuestions - 1) - 0 + 1
-    );
+    // questionIdx = Math.floor(Math.random() * totalQuestions);
+    idxCount++;
+    questionIdx = (questionIdx + 1) % totalQuestions;
   }
 
+  curQuestionId = quizModel.questionIds[questionIdx];
   const question = await QuestionsModel.findOne(
-    { questionId: questionIdx },
+    { questionId: curQuestionId },
     { question: 1, answers: 1 }
   );
+
   await Team.findOneAndUpdate(
     { _id: req.params.teamId },
     {
-      $push: { completedQuestions: questionIdx },
+      $push: { completedQuestions: curQuestionId },
     }
   );
 

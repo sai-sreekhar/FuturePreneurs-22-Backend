@@ -11,8 +11,7 @@ module.exports = {
       photoUrl: Joi.string(),
       mobileNumber: Joi.string()
         .length(10)
-        .pattern(/^[0-9]+$/)
-        .required(),
+        .pattern(/^[0-9]+$/),
     });
     return schema.validate(body);
   },
@@ -39,8 +38,7 @@ module.exports = {
       username: Joi.string().required(),
       mobileNumber: Joi.string()
         .length(10)
-        .pattern(/^[0-9]+$/)
-        .required(),
+        .pattern(/^[0-9]+$/),
     });
     return schema.validate(body);
   },
