@@ -11,7 +11,6 @@ const {
   approvalStatusTypes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  totalNumberOfQuestions,
   quizId,
 } = require("../../utils/constants");
 const {
@@ -621,17 +620,19 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
   const quizModel = await QuizModel.findById({ _id: quizId });
-  let questionIdx = Math.floor(
-    Math.random() * (totalNumberOfQuestions - 1) - 0 + 1
-  );
 
+  const totalQuestions = quizModel.questionIds.length;
+  let questionIdx = Math.floor(Math.random() * totalQuestions);
+  let curQuestionId = quizModel.questionIds[questionIdx];
+
+  let idxCount = 0;
   while (
-    !quizModel.questionIds.includes(questionIdx) ||
-    team.completedQuestions.includes(questionIdx)
+    team.completedQuestions.includes(curQuestionId) &&
+    idxCount <= totalQuestions
   ) {
-    questionIdx = Math.floor(
-      Math.random() * (totalNumberOfQuestions - 1) - 0 + 1
-    );
+    // questionIdx = Math.floor(Math.random() * totalQuestions);
+    idxCount++;
+    questionIdx = (questionIdx + 1) % totalQuestions;
   }
 
   const question = await QuestionsModel.findOne(
