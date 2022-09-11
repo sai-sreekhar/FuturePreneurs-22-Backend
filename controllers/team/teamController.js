@@ -623,7 +623,6 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
 
   const totalQuestions = quizModel.questionIds.length;
   let questionIdx = Math.floor(Math.random() * totalQuestions);
-  let curQuestionId = quizModel.questionIds[questionIdx];
 
   let idxCount = 0;
   while (
@@ -635,14 +634,16 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     questionIdx = (questionIdx + 1) % totalQuestions;
   }
 
+  const curQuestionId = quizModel.questionIds[questionIdx];
   const question = await QuestionsModel.findOne(
-    { questionId: questionIdx },
+    { questionId: curQuestionId },
     { question: 1, answers: 1 }
   );
+
   await Team.findOneAndUpdate(
     { _id: req.params.teamId },
     {
-      $push: { completedQuestions: questionIdx },
+      $push: { completedQuestions: curQuestionId },
     }
   );
 
