@@ -55,6 +55,8 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
       lastName: "",
       regNo: "",
       mobileNumber: "",
+      teamId: null,
+      teamRole: null,
     }).save();
 
     const user = await User.findOne({ email: emailFromClient });
