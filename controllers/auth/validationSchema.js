@@ -38,4 +38,12 @@ module.exports = {
     });
     return schema.validate(body);
   },
+
+  isRegisteredBodyValidation: (body) => {
+    const schema = Joi.object({
+      token: Joi.string().required(),
+      email: Joi.string().email().required(),
+    });
+    return schema.validate(body);
+  },
 };

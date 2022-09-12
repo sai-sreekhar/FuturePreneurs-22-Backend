@@ -10,6 +10,7 @@ const {
   signUpBodyValidation,
   logInBodyValidation,
   refreshTokenBodyValidation,
+  isRegisteredBodyValidation,
 } = require("./validationSchema");
 const client = new OAuth2Client(process.env.CLIENT_ID);
 const bcrypt = require("bcrypt");
@@ -44,7 +45,6 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
   }
 
-  console.log(ticket);
   const user = await User.findOne({ email: emailFromClient });
 
   if (!user) {
@@ -219,4 +219,46 @@ exports.logout = catchAsync(async (req, res, next) => {
   }
   await userToken.remove();
   res.status(200).json({ message: "Logged Out Sucessfully" });
+});
+
+exports.isRegistered = catchAsync(async (req, res, next) => {
+  const { error } = isRegisteredBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
+
+  const token = req.body.token;
+  const emailFromClient = req.body.email;
+
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  if (!ticket) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const { email } = ticket.getPayload();
+  if (email !== emailFromClient) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const user = await User.findOne({ email: emailFromClient });
+
+  let isRegistered = true;
+  if (!user) {
+    isRegistered = false;
+  }
+
+  return res.status(201).json({
+    message: "Checking User Successfull",
+    isRegistered,
+  });
 });
