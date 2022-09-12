@@ -6,7 +6,7 @@ const AppError = require("./utils/appError");
 const morgan = require("morgan");
 
 const app = express();
-// app.use(require("express-status-monitor")());
+app.use(require("express-status-monitor")());
 
 app.use(express.json());
 
