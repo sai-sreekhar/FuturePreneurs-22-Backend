@@ -183,10 +183,17 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   }
 
   //updating fields
-  if (req.body.name) {
+  if (req.body.firstName) {
     await User.updateOne(
       { _id: req.user._id },
-      { $set: { name: req.body.name } }
+      { $set: { firstName: req.body.firstName } }
+    );
+  }
+
+  if (req.body.lastName) {
+    await User.updateOne(
+      { _id: req.user._id },
+      { $set: { lastName: req.body.lastName } }
     );
   }
 
@@ -194,13 +201,6 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     await User.updateOne(
       { _id: req.user._id },
       { $set: { regNo: req.body.regNo } }
-    );
-  }
-
-  if (req.body.photoUrl) {
-    await User.updateOne(
-      { _id: req.user._id },
-      { $set: { photoUrl: req.body.photoUrl } }
     );
   }
 

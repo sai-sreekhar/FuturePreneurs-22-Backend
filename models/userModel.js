@@ -15,13 +15,13 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
     },
-    name: {
+    firstName: {
+      type: String,
+    },
+    lastName: {
       type: String,
     },
     regNo: {
-      type: String,
-    },
-    photoUrl: {
       type: String,
     },
     mobileNumber: {

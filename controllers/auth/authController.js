@@ -51,10 +51,10 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
     await new User({
       loginType: loginType.GOOGLE_LOGIN,
       email: emailFromClient,
-      mobileNumber: req.body.mobileNumber,
-      name: req.body.name,
+      firstName: "",
+      lastName: "",
       regNo: "",
-      username: "",
+      mobileNumber: "",
     }).save();
 
     const user = await User.findOne({ email: emailFromClient });

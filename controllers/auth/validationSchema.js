@@ -35,10 +35,6 @@ module.exports = {
     const schema = Joi.object({
       token: Joi.string().required(),
       email: Joi.string().email().required(),
-      username: Joi.string().required(),
-      mobileNumber: Joi.string()
-        .length(10)
-        .pattern(/^[0-9]+$/),
     });
     return schema.validate(body);
   },

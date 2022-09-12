@@ -6,6 +6,8 @@ const AppError = require("./utils/appError");
 const morgan = require("morgan");
 
 const app = express();
+// app.use(require("express-status-monitor")());
+
 app.use(express.json());
 
 // app.use(
@@ -47,11 +49,12 @@ app.use(function (req, res, next) {
 //   })
 // );
 
-morgan.token('req-headers', function(req,res){
-  return JSON.stringify(req.headers)
- })
- 
- process.env.NODE_ENV != 'production' && app.use(morgan(':method :url :status :req-headers'));
+morgan.token("req-headers", function (req, res) {
+  return JSON.stringify(req.headers);
+});
+
+process.env.NODE_ENV != "production" &&
+  app.use(morgan(":method :url :status :req-headers"));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));
