@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    hasFilledDetails: {
+      type: Boolean,
+    },
     firstName: {
       type: String,
     },

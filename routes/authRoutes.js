@@ -7,6 +7,5 @@ authRouter.route("/signUp").post(authController.basicAuthSignUp);
 authRouter.route("/logIn").post(authController.basicAuthLogIn);
 authRouter.route("/logout").delete(authController.logout);
 authRouter.route("/refreshToken").post(authController.getNewAccessToken);
-authRouter.route("/").post(authController.isRegistered)
 
 module.exports = authRouter;

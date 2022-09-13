@@ -10,7 +10,6 @@ const {
   signUpBodyValidation,
   logInBodyValidation,
   refreshTokenBodyValidation,
-  isRegisteredBodyValidation,
 } = require("./validationSchema");
 const client = new OAuth2Client(process.env.CLIENT_ID);
 const bcrypt = require("bcrypt");
@@ -51,10 +50,11 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
     await new User({
       loginType: loginType.GOOGLE_LOGIN,
       email: emailFromClient,
-      firstName: "",
-      lastName: "",
-      regNo: "",
-      mobileNumber: "",
+      hasfilledDetails: false,
+      firstName: null,
+      lastName: null,
+      regNo: null,
+      mobileNumber: null,
       teamId: null,
       teamRole: null,
     }).save();
@@ -105,10 +105,11 @@ exports.basicAuthSignUp = catchAsync(async (req, res, next) => {
     username: req.body.username,
     password: hashPassword,
     email: req.body.email,
-    name: req.body.name,
-    regNo: req.body.regNo,
-    photoUrl: req.body.photoUrl,
-    mobileNumber: req.body.mobileNumber,
+    hasfilledDetails: false,
+    firstName: null,
+    lastName: null,
+    regNo: null,
+    mobileNumber: null,
     teamId: null,
     teamRole: null,
   }).save();
@@ -219,46 +220,4 @@ exports.logout = catchAsync(async (req, res, next) => {
   }
   await userToken.remove();
   res.status(200).json({ message: "Logged Out Sucessfully" });
-});
-
-exports.isRegistered = catchAsync(async (req, res, next) => {
-  const { error } = isRegisteredBodyValidation(req.body);
-  if (error) {
-    return next(
-      new AppError(
-        error.details[0].message,
-        400,
-        errorCodes.INPUT_PARAMS_INVALID
-      )
-    );
-  }
-
-  const token = req.body.token;
-  const emailFromClient = req.body.email;
-
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
-
-  if (!ticket) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
-  }
-
-  const { email } = ticket.getPayload();
-  if (email !== emailFromClient) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
-  }
-
-  const user = await User.findOne({ email: emailFromClient });
-
-  let isRegistered = true;
-  if (!user) {
-    isRegistered = false;
-  }
-
-  return res.status(201).json({
-    message: "Checking User Successfull",
-    isRegistered,
-  });
 });

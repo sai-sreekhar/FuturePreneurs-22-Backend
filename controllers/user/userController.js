@@ -1,4 +1,5 @@
 const User = require("../../models/userModel");
+const { OAuth2Client } = require("google-auth-library");
 const Team = require("../../models/teamModel");
 const PendingApprovalsModel = require("../../models/pendingApprovalsModel");
 const AppError = require("../../utils/appError");
@@ -12,8 +13,11 @@ const {
 const {
   updateUserBodyValidation,
   joinTeamViaTokenBodyValidation,
+  fillUserDetailsBodyValidation,
+  hasfilledDetailsBodyValidation,
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
+const client = new OAuth2Client(process.env.CLIENT_ID);
 
 exports.sendRequest = catchAsync(async (req, res, next) => {
   const user = await User.findById({ _id: req.user._id });
@@ -166,6 +170,75 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     message: "Removed request successfully",
+  });
+});
+
+exports.fillUserDetails = catchAsync(async (req, res, next) => {
+  //body validation
+  const { error } = fillUserDetailsBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
+
+  await User.updateOne(
+    { _id: req.user._id },
+    {
+      $set: {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        regNo: req.body.regNo,
+        mobileNumber: req.body.mobileNumber,
+        hasfilledDetails: true,
+      },
+    }
+  );
+
+  res.status(201).json({
+    message: "User Details Filled successfully",
+    userId: req.user._id,
+  });
+});
+
+exports.hasFilledDetails = catchAsync(async (req, res, next) => {
+  const { error } = hasfilledDetailsBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
+
+  const token = req.body.token;
+  const emailFromClient = req.body.email;
+
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  if (!ticket) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const { email } = ticket.getPayload();
+  if (email !== emailFromClient) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const user = await User.findOne({ email: emailFromClient });
+
+  return res.status(201).json({
+    message: "Checking User Successfull",
+    hasFilledDetails: user.hasFilledDetails,
   });
 });
 
