@@ -514,20 +514,19 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllTeams = catchAsync(async (req, res, next) => {
-  const startTime = Date.now();
-
-  const teams = await Team.find().populate("members", {
-    name: 1,
-    teamRole: 1,
-    email: 1,
-    mobileNumber: 1,
-  });
-
-  const endTime = Date.now();
-  console.log("Time Taken = ", endTime - startTime);
+  // const startTime = Date.now();
+  // const teams = await Team.find().populate("members", {
+  //   name: 1,
+  //   teamRole: 1,
+  //   email: 1,
+  //   mobileNumber: 1,
+  // });
+  // const endTime = Date.now();
+  // console.log("Time Taken = ", endTime - startTime);
+  // console.log(teams);
   res.status(201).json({
     message: "Get all teams successfull",
-    teams,
+    paginatedResult: res.paginatedResults,
   });
 });
 
@@ -624,7 +623,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
   const totalQuestions = quizModel.questionIds.length;
   let questionIdx = Math.floor(Math.random() * totalQuestions);
   let curQuestionId = quizModel.questionIds[questionIdx];
-  
+
   let idxCount = 0;
   while (
     team.completedQuestions.includes(curQuestionId) &&
