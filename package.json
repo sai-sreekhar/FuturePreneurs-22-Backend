@@ -4,9 +4,9 @@
   "description": "Practicing auth and team creation logic",
   "main": "server.js",
   "scripts": {
-    "start": "forever start --minUptime 1000 --spinSleepTime 1000 server.js",
+    "start": "pm2 start server.js -i 5",
     "start1": "node server.js",
-    "stop": "forever stop server.js",
+    "stop": "pm2 stop server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
