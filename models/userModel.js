@@ -30,6 +30,9 @@ const userSchema = new mongoose.Schema(
     mobileNumber: {
       type: String,
     },
+    noOfPendingRequests: {
+      type: Number,
+    },
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teams",

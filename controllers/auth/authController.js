@@ -55,6 +55,7 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
       lastName: null,
       regNo: null,
       mobileNumber: null,
+      noOfPendingRequests: 0,
       teamId: null,
       teamRole: null,
     }).save();
@@ -110,6 +111,7 @@ exports.basicAuthSignUp = catchAsync(async (req, res, next) => {
     lastName: null,
     regNo: null,
     mobileNumber: null,
+    noOfPendingRequests: 0,
     teamId: null,
     teamRole: null,
   }).save();

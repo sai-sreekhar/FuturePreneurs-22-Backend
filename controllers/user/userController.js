@@ -38,6 +38,16 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (user.noOfPendingRequests >= 5) {
+    return next(
+      new AppError(
+        "Already 5 Requests are Pending.",
+        412,
+        errorCodes.PENDING_REQUESTS_LIMIT_REACHED
+      )
+    );
+  }
+
   //checking whether user is already a part of team
   if (user.teamId) {
     return next(
@@ -81,6 +91,15 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     userId: req.user._id,
     status: requestStatusTypes.PENDING_APPROVAL,
   }).save();
+
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: 1 },
+    }
+  );
 
   res.status(201).json({
     message: "Sent request successfully",
@@ -166,6 +185,15 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   await PendingApprovalsModel.updateOne(
     { userId: req.user._id, teamId: req.params.teamId },
     { $set: { status: requestStatusTypes.REQUEST_TAKEN_BACK } }
+  );
+
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: -1 },
+    }
   );
 
   res.status(201).json({

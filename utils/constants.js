@@ -51,6 +51,7 @@ const errorCodes = {
   NOT_ADMIN: 22,
   INVALID_QUESTION_ID: 23,
   NO_DATA_FOUND: 24,
+  PENDING_REQUESTS_LIMIT_REACHED: 25,
 };
 
 const objectIdLength = 24;

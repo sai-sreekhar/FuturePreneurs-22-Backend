@@ -418,6 +418,15 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
     );
   }
 
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: -1 },
+    }
+  );
+
   res.status(201).json({
     message: "Updated request successfully",
   });
