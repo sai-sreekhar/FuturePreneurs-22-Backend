@@ -11,6 +11,6 @@ userRouter.route("/requests/:teamId").post(auth, userController.sendRequest);
 userRouter.route("/requests/:teamId").patch(auth, userController.removeRequest);
 userRouter.route("/leave/:teamId").patch(auth, userController.leaveTeam);
 userRouter.route("/token").patch(auth, userController.joinTeamViaToken);
-userRouter.route("/").get(auth, userController.getTeam);
+userRouter.route("/getTeam").get(auth, userController.getTeam);
 
 module.exports = userRouter;
