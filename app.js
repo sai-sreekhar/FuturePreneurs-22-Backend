@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.use(
   limiter({
-    windowMs: 1 * 60 * 1000, //750 per min requests allowed from one IP address
+    windowMs: 1 * 60 * 1000, //100 per min requests allowed from one IP address
     max: 100,
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
