@@ -49,6 +49,8 @@ app.use(function (req, res, next) {
 //   })
 // );
 
+// app.use(cors());
+
 morgan.token("req-headers", function (req, res) {
   return JSON.stringify(req.headers);
 });

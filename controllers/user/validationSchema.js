@@ -20,12 +20,13 @@ module.exports = {
       regNo: Joi.string().required(),
       mobileNumber: Joi.string()
         .length(10)
-        .pattern(/^[0-9]+$/).required(),
+        .pattern(/^[0-9]+$/)
+        .required(),
     });
     return Schema.validate(body);
   },
 
-  hasfilledDetailsBodyValidation: (body) => {
+  hasFilledDetailsBodyValidation: (body) => {
     const schema = Joi.object({
       token: Joi.string().required(),
       email: Joi.string().email().required(),

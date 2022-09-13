@@ -50,7 +50,7 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
     await new User({
       loginType: loginType.GOOGLE_LOGIN,
       email: emailFromClient,
-      hasfilledDetails: false,
+      hasFilledDetails: false,
       firstName: null,
       lastName: null,
       regNo: null,
@@ -106,7 +106,7 @@ exports.basicAuthSignUp = catchAsync(async (req, res, next) => {
     username: req.body.username,
     password: hashPassword,
     email: req.body.email,
-    hasfilledDetails: false,
+    hasFilledDetails: false,
     firstName: null,
     lastName: null,
     regNo: null,

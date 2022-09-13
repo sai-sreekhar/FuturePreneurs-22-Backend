@@ -14,7 +14,7 @@ const {
   updateUserBodyValidation,
   joinTeamViaTokenBodyValidation,
   fillUserDetailsBodyValidation,
-  hasfilledDetailsBodyValidation,
+  hasFilledDetailsBodyValidation,
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
 const client = new OAuth2Client(process.env.CLIENT_ID);
@@ -222,7 +222,7 @@ exports.fillUserDetails = catchAsync(async (req, res, next) => {
         lastName: req.body.lastName,
         regNo: req.body.regNo,
         mobileNumber: req.body.mobileNumber,
-        hasfilledDetails: true,
+        hasFilledDetails: true,
       },
     }
   );
@@ -234,7 +234,7 @@ exports.fillUserDetails = catchAsync(async (req, res, next) => {
 });
 
 exports.hasFilledDetails = catchAsync(async (req, res, next) => {
-  const { error } = hasfilledDetailsBodyValidation(req.body);
+  const { error } = hasFilledDetailsBodyValidation(req.body);
   if (error) {
     return next(
       new AppError(
