@@ -29,10 +29,12 @@ module.exports = {
         results.results = await teamModel
           .find({}, { completedQuestions: 0 })
           .populate("members", {
-            name: 1,
-            teamRole: 1,
             email: 1,
+            firstName: 1,
+            lastName: 1,
+            regNo: 1,
             mobileNumber: 1,
+            teamRole: 1,
           })
           .limit(limit)
           .skip(startIndex)

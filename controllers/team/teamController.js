@@ -24,7 +24,6 @@ const { generateTeamToken } = require("./utils");
 const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
-const UserModel = require("../../models/userModel");
 
 exports.createTeam = catchAsync(async (req, res, next) => {
   //body validation
@@ -102,10 +101,17 @@ exports.getTeamDetails = catchAsync(async (req, res, next) => {
     );
   }
 
-  const team = await Team.findById({ _id: req.params.teamId }).populate(
-    "members",
-    { name: 1, teamRole: 1, email: 1, mobileNumber: 1 }
-  );
+  const team = await Team.findById(
+    { _id: req.params.teamId },
+    { completedQuestions: 0 }
+  ).populate("members", {
+    email: 1,
+    firstName: 1,
+    lastName: 1,
+    regNo: 1,
+    mobileNumber: 1,
+    teamRole: 1,
+  });
 
   //validate team id
   if (!team) {
@@ -271,8 +277,10 @@ exports.getTeamRequests = catchAsync(async (req, res, next) => {
     teamId: req.params.teamId,
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate("userId", {
-    name: 1,
     email: 1,
+    firstName: 1,
+    lastName: 1,
+    regNo: 1,
     mobileNumber: 1,
   });
 

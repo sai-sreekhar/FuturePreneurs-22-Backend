@@ -126,7 +126,11 @@ exports.getRequest = catchAsync(async (req, res, next) => {
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate({
     path: "teamId",
-    populate: { path: "members", select: "name email mobileNumber teamRole" },
+    select: "teamId",
+    populate: {
+      path: "teamLeaderId",
+      select: "email firstName lastName regNo mobileNumber",
+    },
   });
 
   res.status(200).json({
@@ -480,7 +484,14 @@ exports.getTeam = catchAsync(async (req, res, next) => {
     populate: {
       path: "members",
       model: "Users",
-      select: { name: 1, mobileNumber: 1, email: 1, _id: 1, teamRole: 1 },
+      select: {
+        email: 1,
+        firstName: 1,
+        lastName: 1,
+        regNo: 1,
+        mobileNumber: 1,
+        teamRole: 1,
+      },
     },
   });
 
