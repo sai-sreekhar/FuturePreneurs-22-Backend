@@ -477,7 +477,14 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
 exports.getTeam = catchAsync(async (req, res, next) => {
   const user = await User.findById(
     { _id: req.user._id },
-    { name: 1, email: 1, mobileNumber: 1 }
+    {
+      email: 1,
+      firstName: 1,
+      lastName: 1,
+      regNo: 1,
+      mobileNumber: 1,
+      teamRole: 1,
+    }
   ).populate({
     path: "teamId",
     select: { teamName: 1 },
