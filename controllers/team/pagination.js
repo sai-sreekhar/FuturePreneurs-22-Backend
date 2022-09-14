@@ -8,6 +8,19 @@ module.exports = {
       const page = parseInt(req.query.page);
       const limit = parseInt(req.query.limit);
 
+      if (!page && !limit) {
+        try {
+          const results = {};
+          results.results = await teamModel.find({}, { teamName: 1, _id: 0 });
+          res.paginatedResults = results;
+          next();
+        } catch (e) {
+          return next(
+            new AppError("Internal Server Error", 500, errorCodes.UNKNOWN_ERROR)
+          );
+        }
+      }
+
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
