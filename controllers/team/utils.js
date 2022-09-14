@@ -6,7 +6,7 @@ const generateTeamToken = async (team) => {
       _id: team._id,
     };
     const teamToken = jwt.sign(payload, process.env.TEAM_TOKEN_SECRET, {
-      expiresIn: "4d",
+      expiresIn: "5d",
     });
 
     return Promise.resolve({ teamToken });
