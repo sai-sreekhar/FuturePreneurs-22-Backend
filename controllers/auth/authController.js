@@ -44,17 +44,20 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
   }
 
-  console.log(ticket);
   const user = await User.findOne({ email: emailFromClient });
 
   if (!user) {
     await new User({
       loginType: loginType.GOOGLE_LOGIN,
       email: emailFromClient,
-      mobileNumber: req.body.mobileNumber,
-      name: req.body.name,
-      regNo: "",
-      username: "",
+      hasFilledDetails: false,
+      firstName: null,
+      lastName: null,
+      regNo: null,
+      mobileNumber: null,
+      noOfPendingRequests: 0,
+      teamId: null,
+      teamRole: null,
     }).save();
 
     const user = await User.findOne({ email: emailFromClient });
@@ -103,10 +106,12 @@ exports.basicAuthSignUp = catchAsync(async (req, res, next) => {
     username: req.body.username,
     password: hashPassword,
     email: req.body.email,
-    name: req.body.name,
-    regNo: req.body.regNo,
-    photoUrl: req.body.photoUrl,
-    mobileNumber: req.body.mobileNumber,
+    hasFilledDetails: false,
+    firstName: null,
+    lastName: null,
+    regNo: null,
+    mobileNumber: null,
+    noOfPendingRequests: 0,
     teamId: null,
     teamRole: null,
   }).save();

@@ -1,4 +1,5 @@
 const User = require("../../models/userModel");
+const { OAuth2Client } = require("google-auth-library");
 const Team = require("../../models/teamModel");
 const PendingApprovalsModel = require("../../models/pendingApprovalsModel");
 const AppError = require("../../utils/appError");
@@ -12,8 +13,11 @@ const {
 const {
   updateUserBodyValidation,
   joinTeamViaTokenBodyValidation,
+  fillUserDetailsBodyValidation,
+  hasFilledDetailsBodyValidation,
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
+const client = new OAuth2Client(process.env.CLIENT_ID);
 
 exports.sendRequest = catchAsync(async (req, res, next) => {
   const user = await User.findById({ _id: req.user._id });
@@ -31,6 +35,16 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   if (!team) {
     return next(
       new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
+    );
+  }
+
+  if (user.noOfPendingRequests >= 5) {
+    return next(
+      new AppError(
+        "Already 5 Requests are Pending.",
+        412,
+        errorCodes.PENDING_REQUESTS_LIMIT_REACHED
+      )
     );
   }
 
@@ -78,6 +92,15 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     status: requestStatusTypes.PENDING_APPROVAL,
   }).save();
 
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: 1 },
+    }
+  );
+
   res.status(201).json({
     message: "Sent request successfully",
     requestId: newRequest._id,
@@ -103,7 +126,11 @@ exports.getRequest = catchAsync(async (req, res, next) => {
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate({
     path: "teamId",
-    populate: { path: "members", select: "name email mobileNumber teamRole" },
+    select: "teamId",
+    populate: {
+      path: "teamLeaderId",
+      select: "email firstName lastName regNo mobileNumber",
+    },
   });
 
   res.status(200).json({
@@ -164,8 +191,86 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
     { $set: { status: requestStatusTypes.REQUEST_TAKEN_BACK } }
   );
 
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: -1 },
+    }
+  );
+
   res.status(201).json({
     message: "Removed request successfully",
+  });
+});
+
+exports.fillUserDetails = catchAsync(async (req, res, next) => {
+  //body validation
+  const { error } = fillUserDetailsBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
+
+  await User.updateOne(
+    { _id: req.user._id },
+    {
+      $set: {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        regNo: req.body.regNo,
+        mobileNumber: req.body.mobileNumber,
+        hasFilledDetails: true,
+      },
+    }
+  );
+
+  res.status(201).json({
+    message: "User Details Filled successfully",
+    userId: req.user._id,
+  });
+});
+
+exports.hasFilledDetails = catchAsync(async (req, res, next) => {
+  const { error } = hasFilledDetailsBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
+
+  const token = req.body.token;
+  const emailFromClient = req.body.email;
+
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  if (!ticket) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const { email } = ticket.getPayload();
+  if (email !== emailFromClient) {
+    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+  }
+
+  const user = await User.findOne({ email: emailFromClient });
+
+  return res.status(201).json({
+    message: "Checking User Successfull",
+    hasFilledDetails: user.hasFilledDetails,
   });
 });
 
@@ -183,10 +288,17 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   }
 
   //updating fields
-  if (req.body.name) {
+  if (req.body.firstName) {
     await User.updateOne(
       { _id: req.user._id },
-      { $set: { name: req.body.name } }
+      { $set: { firstName: req.body.firstName } }
+    );
+  }
+
+  if (req.body.lastName) {
+    await User.updateOne(
+      { _id: req.user._id },
+      { $set: { lastName: req.body.lastName } }
     );
   }
 
@@ -194,13 +306,6 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     await User.updateOne(
       { _id: req.user._id },
       { $set: { regNo: req.body.regNo } }
-    );
-  }
-
-  if (req.body.photoUrl) {
-    await User.updateOne(
-      { _id: req.user._id },
-      { $set: { photoUrl: req.body.photoUrl } }
     );
   }
 
@@ -379,7 +484,14 @@ exports.getTeam = catchAsync(async (req, res, next) => {
     populate: {
       path: "members",
       model: "Users",
-      select: { name: 1, mobileNumber: 1, email: 1, _id: 1, teamRole: 1 },
+      select: {
+        email: 1,
+        firstName: 1,
+        lastName: 1,
+        regNo: 1,
+        mobileNumber: 1,
+        teamRole: 1,
+      },
     },
   });
 

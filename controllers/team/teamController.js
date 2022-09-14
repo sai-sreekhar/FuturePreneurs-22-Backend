@@ -24,7 +24,6 @@ const { generateTeamToken } = require("./utils");
 const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
-const UserModel = require("../../models/userModel");
 
 exports.createTeam = catchAsync(async (req, res, next) => {
   //body validation
@@ -102,10 +101,17 @@ exports.getTeamDetails = catchAsync(async (req, res, next) => {
     );
   }
 
-  const team = await Team.findById({ _id: req.params.teamId }).populate(
-    "members",
-    { name: 1, teamRole: 1, email: 1, mobileNumber: 1 }
-  );
+  const team = await Team.findById(
+    { _id: req.params.teamId },
+    { completedQuestions: 0 }
+  ).populate("members", {
+    email: 1,
+    firstName: 1,
+    lastName: 1,
+    regNo: 1,
+    mobileNumber: 1,
+    teamRole: 1,
+  });
 
   //validate team id
   if (!team) {
@@ -271,8 +277,10 @@ exports.getTeamRequests = catchAsync(async (req, res, next) => {
     teamId: req.params.teamId,
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate("userId", {
-    name: 1,
     email: 1,
+    firstName: 1,
+    lastName: 1,
+    regNo: 1,
     mobileNumber: 1,
   });
 
@@ -418,6 +426,15 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
     );
   }
 
+  await User.findOneAndUpdate(
+    {
+      _id: req.user._id,
+    },
+    {
+      $inc: { noOfPendingRequests: -1 },
+    }
+  );
+
   res.status(201).json({
     message: "Updated request successfully",
   });
@@ -514,20 +531,19 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllTeams = catchAsync(async (req, res, next) => {
-  const startTime = Date.now();
-
-  const teams = await Team.find().populate("members", {
-    name: 1,
-    teamRole: 1,
-    email: 1,
-    mobileNumber: 1,
-  });
-
-  const endTime = Date.now();
-  console.log("Time Taken = ", endTime - startTime);
+  // const startTime = Date.now();
+  // const teams = await Team.find().populate("members", {
+  //   name: 1,
+  //   teamRole: 1,
+  //   email: 1,
+  //   mobileNumber: 1,
+  // });
+  // const endTime = Date.now();
+  // console.log("Time Taken = ", endTime - startTime);
+  // console.log(teams);
   res.status(201).json({
     message: "Get all teams successfull",
-    teams,
+    paginatedResult: res.paginatedResults,
   });
 });
 
@@ -624,7 +640,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
   const totalQuestions = quizModel.questionIds.length;
   let questionIdx = Math.floor(Math.random() * totalQuestions);
   let curQuestionId = quizModel.questionIds[questionIdx];
-  
+
   let idxCount = 0;
   while (
     team.completedQuestions.includes(curQuestionId) &&

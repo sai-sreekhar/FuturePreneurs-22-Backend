@@ -4,20 +4,25 @@ const errorController = require("./controllers/errorController");
 const { errorCodes } = require("./utils/constants");
 const AppError = require("./utils/appError");
 const morgan = require("morgan");
+const limiter = require("express-rate-limit");
 
 const app = express();
+// app.use(require("express-status-monitor")());
+
 app.use(express.json());
 
-// app.use(
-//   limiter({
-//     windowMs: 1 * 60 * 1000, //750 per min requests allowed from one IP address
-//     max: 750,
-//     message: {
-//       code: 429,
-//       message: "Too many requests made, please try again later",
-//     },
-//   })
-// );
+app.use(
+  limiter({
+    windowMs: 1 * 60 * 1000, //100 per min requests allowed from one IP address
+    max: 100,
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: {
+      code: 429,
+      message: "Too many requests made, please try again later",
+    },
+  })
+);
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
@@ -47,11 +52,14 @@ app.use(function (req, res, next) {
 //   })
 // );
 
-morgan.token('req-headers', function(req,res){
-  return JSON.stringify(req.headers)
- })
- 
- process.env.NODE_ENV != 'production' && app.use(morgan(':method :url :status :req-headers'));
+// app.use(cors());
+
+morgan.token("req-headers", function (req, res) {
+  return JSON.stringify(req.headers);
+});
+
+process.env.NODE_ENV != "production" &&
+  app.use(morgan(":method :url :status :req-headers"));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));

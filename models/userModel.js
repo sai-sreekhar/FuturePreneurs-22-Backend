@@ -15,17 +15,23 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
     },
-    name: {
+    hasFilledDetails: {
+      type: Boolean,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
       type: String,
     },
     regNo: {
       type: String,
     },
-    photoUrl: {
-      type: String,
-    },
     mobileNumber: {
       type: String,
+    },
+    noOfPendingRequests: {
+      type: Number,
     },
     teamId: {
       type: mongoose.Schema.Types.ObjectId,

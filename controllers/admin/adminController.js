@@ -332,11 +332,11 @@ exports.setEndTime = catchAsync(async (req, res, next) => {
     );
   }
 
-  console.log(Date.UTC());
+  // console.log(Date.UTC());
   const teamQuizModel = await TeamQuizModel.findOneAndUpdate(
     { _teamId: req.params.id },
     {
-      endTime: (Date.UTC() + req.body.minutes * 60000),
+      endTime: Date.UTC() + req.body.minutes * 60000,
     }
   );
 
