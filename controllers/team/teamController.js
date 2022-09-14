@@ -428,7 +428,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
 
   await User.findOneAndUpdate(
     {
-      _id: req.user._id,
+      _id: req.body.userId,
     },
     {
       $inc: { noOfPendingRequests: -1 },
