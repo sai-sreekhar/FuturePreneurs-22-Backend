@@ -126,10 +126,10 @@ exports.getRequest = catchAsync(async (req, res, next) => {
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate({
     path: "teamId",
-    select: "teamId",
+    select: "teamName teamLeaderId members",
     populate: {
-      path: "teamLeaderId",
-      select: "email firstName lastName regNo mobileNumber",
+      path: "teamName teamLeaderId",
+      select: "email firstName lastName regNo mobileNumber teamRole",
     },
   });
 
