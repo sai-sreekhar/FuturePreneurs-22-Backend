@@ -121,15 +121,15 @@ exports.getTeamDetails = catchAsync(async (req, res, next) => {
   }
 
   //check if user is part of given team
-  if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
-    return next(
-      new AppError(
-        "User is not part of given teamID or user isn't part of any team",
-        412,
-        errorCodes.INVALID_USERID_FOR_TEAMID
-      )
-    );
-  }
+  // if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
+  //   return next(
+  //     new AppError(
+  //       "User is not part of given teamID or user isn't part of any team",
+  //       412,
+  //       errorCodes.INVALID_USERID_FOR_TEAMID
+  //     )
+  //   );
+  // }
 
   res.status(200).json({
     message: "Getting team details successfull",
