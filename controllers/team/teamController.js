@@ -385,6 +385,15 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
       },
       { $set: { status: requestStatusTypes.REJECTED } }
     );
+
+    await User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+      },
+      {
+        $inc: { noOfPendingRequests: -1 },
+      }
+    );
   }
 
   if (req.body.status === approvalStatusTypes.APPROVED) {
@@ -424,16 +433,16 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
         $push: { members: req.body.userId },
       }
     );
-  }
 
-  await User.findOneAndUpdate(
-    {
-      _id: req.body.userId,
-    },
-    {
-      $inc: { noOfPendingRequests: -1 },
-    }
-  );
+    await User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+      },
+      {
+        noOfPendingRequests: 0,
+      }
+    );
+  }
 
   res.status(201).json({
     message: "Updated request successfully",
@@ -514,7 +523,7 @@ exports.removeMember = catchAsync(async (req, res, next) => {
   );
 
   //updating PendingApprovalsModel
-  const x = await PendingApprovalsModel.findOneAndUpdate(
+  await PendingApprovalsModel.findOneAndUpdate(
     {
       userId: req.body.userId,
       teamId: req.params.teamId,
@@ -527,7 +536,7 @@ exports.removeMember = catchAsync(async (req, res, next) => {
       $set: { status: requestStatusTypes.REMOVED_FROM_TEAM },
     }
   );
-  
+
   res.status(201).json({
     message: "User removed successfully",
   });

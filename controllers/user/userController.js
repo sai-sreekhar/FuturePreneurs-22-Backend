@@ -428,7 +428,13 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
         {
           _id: req.user._id,
         },
-        { $set: { teamId: team._id, teamRole: teamRole.MEMBER } }
+        {
+          $set: {
+            teamId: team._id,
+            teamRole: teamRole.MEMBER,
+            noOfPendingRequests: 0,
+          },
+        }
       );
 
       //updating pending approvals model of particular team id to a status
