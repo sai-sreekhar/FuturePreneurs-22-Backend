@@ -376,7 +376,10 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
     {
       userId: req.user._id,
       teamId: req.params.teamId,
-      status: requestStatusTypes.APPROVED,
+      $or: [
+        { status: requestStatusTypes.APPROVED },
+        { status: requestStatusTypes.JOINED_VIA_TOKEN },
+      ],
     },
     {
       $set: { status: requestStatusTypes.LEFT_TEAM },
