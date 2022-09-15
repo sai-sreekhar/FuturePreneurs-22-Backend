@@ -514,17 +514,20 @@ exports.removeMember = catchAsync(async (req, res, next) => {
   );
 
   //updating PendingApprovalsModel
-  await PendingApprovalsModel.findOneAndUpdate(
+  const x = await PendingApprovalsModel.findOneAndUpdate(
     {
       userId: req.body.userId,
       teamId: req.params.teamId,
-      status: requestStatusTypes.APPROVED,
+      $or: [
+        { status: requestStatusTypes.APPROVED },
+        { status: requestStatusTypes.JOINED_VIA_TOKEN },
+      ],
     },
     {
       $set: { status: requestStatusTypes.REMOVED_FROM_TEAM },
     }
   );
-
+  
   res.status(201).json({
     message: "User removed successfully",
   });
