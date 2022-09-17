@@ -11,7 +11,7 @@ module.exports = {
       if (!page && !limit) {
         try {
           const results = {};
-          results.results = await teamModel.find({}, { teamName: 1});
+          results.results = await teamModel.find({}, { teamName: 1 });
           res.paginatedResults = results;
           next();
         } catch (e) {

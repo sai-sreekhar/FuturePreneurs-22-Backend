@@ -43,7 +43,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   if (user.noOfPendingRequests >= 5) {
     return next(
       new AppError(
-        "Already 5 Requests are Pending.",
+        "Can't send more than 5 requests",
         412,
         errorCodes.PENDING_REQUESTS_LIMIT_REACHED
       )
@@ -54,7 +54,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -160,7 +160,7 @@ exports.getRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -180,7 +180,7 @@ exports.getRequest = catchAsync(async (req, res, next) => {
   });
 
   res.status(200).json({
-    message: "Get user requests successfull",
+    message: "Get User Requests Successfull",
     requests,
   });
 });
@@ -208,7 +208,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -225,7 +225,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   if (!request) {
     return next(
       new AppError(
-        "No pending request found",
+        "No Pending Request Found",
         412,
         errorCodes.NO_PENDING_REQUESTS
       )
@@ -251,7 +251,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   );
 
   res.status(201).json({
-    message: "Removed request successfully",
+    message: "Removed Request Successfully",
   });
 });
 
@@ -398,7 +398,7 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
   if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
     return next(
       new AppError(
-        "User is not part of given teamID or user isn't part of any team",
+        "User is not part of given TeamID or user isn't part of any Team",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID
       )
@@ -408,7 +408,11 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
   //check the role. Leader can leave team remove members and delete team.
   if (user.teamRole === teamRole.LEADER) {
     return next(
-      new AppError("User is a Leader", 412, errorCodes.USER_IS_LEADER)
+      new AppError(
+        "Leader can't Leave the Team",
+        412,
+        errorCodes.USER_IS_LEADER
+      )
     );
   }
 
@@ -438,7 +442,7 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     error: false,
-    message: "Leaving team successfull",
+    message: "Leaving Team Successfull",
   });
 });
 
@@ -461,7 +465,7 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -520,7 +524,7 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
       );
 
       res.status(201).json({
-        message: "Joined team successfully",
+        message: "Joined Team Successfully",
         teamId: team._id,
       });
     })
@@ -562,7 +566,7 @@ exports.getTeam = catchAsync(async (req, res, next) => {
   });
 
   res.status(200).json({
-    message: "Getting user team details successfull",
+    message: "Getting User Team Details Successfull",
     user,
   });
 });
