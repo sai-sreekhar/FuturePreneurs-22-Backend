@@ -77,5 +77,5 @@ module.exports = {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
-  SESConfig,
+  // SESConfig,
 };
