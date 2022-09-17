@@ -10,7 +10,7 @@ adminRouter.route("/endTime/:teamId").patch(auth, adminController.setEndTime);
 adminRouter.route("/questions").get(auth, adminController.getQuestions);
 adminRouter
   .route("/question/:questionId")
-  .get(auth, adminCosntroller.getQuestion);
+  .get(auth, adminController.getQuestion);
 adminRouter.route("/question").post(auth, adminController.setQuestion);
 adminRouter
   .route("/question/:questionId")
