@@ -9,6 +9,7 @@ const {
   requestStatusTypes,
   teamRole,
   objectIdLength,
+  // SESConfig,
 } = require("../../utils/constants");
 const {
   updateUserBodyValidation,
@@ -18,6 +19,7 @@ const {
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
 const client = new OAuth2Client(process.env.CLIENT_ID);
+// const AWS = require("aws-sdk");
 
 exports.sendRequest = catchAsync(async (req, res, next) => {
   const user = await User.findById({ _id: req.user._id });
@@ -100,6 +102,50 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
       $inc: { noOfPendingRequests: 1 },
     }
   );
+
+  // const teamLeader = await User.findById({ _id: team.teamLeaderId });
+  // var params = {
+  //   Source: "mail@saisreekar.live",
+  //   Destination: {
+  //     ToAddresses: ["sai.sreekhar@gmail.com"], //teamLeader.email
+  //   },
+  //   ReplyToAddresses: ["godalasai.sreekar2021@vitstudent.ac.in"],
+  //   Message: {
+  //     Body: {
+  //       Html: {
+  //         Charset: "UTF-8",
+  //         Data:
+  //           user.firstName +
+  //           " " +
+  //           user.lastName +
+  //           " " +
+  //           "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
+  //           user.firstName +
+  //           " " +
+  //           user.lastName +
+  //           " Mobile Number: " +
+  //           user.mobileNumber +
+  //           "<br>" +
+  //           user.firstName +
+  //           " " +
+  //           user.lastName +
+  //           " Email: " +
+  //           user.email,
+  //       },
+  //     },
+  //     Subject: {
+  //       Charset: "UTF-8",
+  //       Data: "Pending Approval from a User",
+  //     },
+  //   },
+  // };
+
+  // new AWS.SES(SESConfig)
+  //   .sendEmail(params)
+  //   .promise()
+  //   .then((res) => {
+  //     console.log(res);
+  //   });
 
   res.status(201).json({
     message: "Sent request successfully",
@@ -187,7 +233,11 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   }
 
   await PendingApprovalsModel.updateOne(
-    { userId: req.user._id, teamId: req.params.teamId },
+    {
+      userId: req.user._id,
+      teamId: req.params.teamId,
+      status: requestStatusTypes.PENDING_APPROVAL,
+    },
     { $set: { status: requestStatusTypes.REQUEST_TAKEN_BACK } }
   );
 

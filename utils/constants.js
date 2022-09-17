@@ -1,3 +1,6 @@
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
 const loginType = {
   GOOGLE_LOGIN: 0,
   BASIC_LOGIN: 1,
@@ -54,6 +57,13 @@ const errorCodes = {
   PENDING_REQUESTS_LIMIT_REACHED: 25,
 };
 
+// const SESConfig = {
+//   apiVersion: "2010-12-01",
+//   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SES_SECRET_KEY,
+//   region: process.env.AWS_SES_REGION,
+// };
+
 const objectIdLength = 24;
 const noOfQuestionsToAnswer = 15;
 const quizId = "631dd7972e4ee9fda84c1538";
@@ -67,4 +77,5 @@ module.exports = {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
+  SESConfig,
 };

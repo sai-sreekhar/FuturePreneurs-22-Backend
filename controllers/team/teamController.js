@@ -12,6 +12,7 @@ const {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
+   // SESConfig,
 } = require("../../utils/constants");
 const {
   createTeamBodyValidation,
@@ -24,6 +25,7 @@ const { generateTeamToken } = require("./utils");
 const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
+// const AWS = require("aws-sdk");
 
 exports.createTeam = catchAsync(async (req, res, next) => {
   //body validation
@@ -44,7 +46,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   const team = await Team.findOne({ teamName: req.body.teamName });
   if (team) {
     return next(
-      new AppError("TeamName already exists", 412, errorCodes.TEAM_NAME_EXISTS)
+      new AppError("TeamName Already Exists", 412, errorCodes.TEAM_NAME_EXISTS)
     );
   }
 
@@ -330,11 +332,6 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
     );
   }
 
-  //checking team size
-  if (team.members.length === 4) {
-    return next(new AppError("Team is Full", 412, errorCodes.TEAM_IS_FULL));
-  }
-
   //check whether userid (user whose status is to be updated) is valid
   const requestedUser = await User.findById({ _id: req.body.userId });
   if (!requestedUser) {
@@ -397,6 +394,11 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
   }
 
   if (req.body.status === approvalStatusTypes.APPROVED) {
+    
+    //checking team size
+    if (team.members.length === 4) {
+      return next(new AppError("Team is Full", 412, errorCodes.TEAM_IS_FULL));
+    }
     //updating users teamid and role
     await User.findOneAndUpdate(
       {
@@ -442,6 +444,41 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
         noOfPendingRequests: 0,
       }
     );
+    
+  //   const user = await User.findById({ _id: req.body.userId });
+  //   var params = {
+  //     Source: "mail@saisreekar.live",
+  //     Destination: {
+  //       ToAddresses: ["sai.sreekhar@gmail.com"], //teamLeader.email
+  //     },
+  //     ReplyToAddresses: ["godalasai.sreekar2021@vitstudent.ac.in"],
+  //     Message: {
+  //       Body: {
+  //         Html: {
+  //           Charset: "UTF-8",
+  //           Data:
+  //             user.firstName +
+  //             " " +
+  //             user.lastName +
+  //             " " +
+  //             "your request is accepted by team " +
+  //             team.teamName +
+  //             ".Click on the link to view the team. https://future-preneurs-22.vercel.app/.<br>",
+  //         },
+  //       },
+  //       Subject: {
+  //         Charset: "UTF-8",
+  //         Data: "Pending Request Approved",
+  //       },
+  //     },
+  //   };
+
+  //   new AWS.SES(SESConfig)
+  //     .sendEmail(params)
+  //     .promise()
+  //     .then((res) => {
+  //       console.log(res);
+  //     });
   }
 
   res.status(201).json({
