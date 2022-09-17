@@ -46,7 +46,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   const team = await Team.findOne({ teamName: req.body.teamName });
   if (team) {
     return next(
-      new AppError("TeamName Already Exists", 412, errorCodes.TEAM_NAME_EXISTS)
+      new AppError("TeamName Already Exists. Choose other TeamName", 412, errorCodes.TEAM_NAME_EXISTS)
     );
   }
 
