@@ -192,28 +192,28 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   //   }
   // });
 
-  sendEmail({
-    subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
-    text:
-      user.firstName +
-      " " +
-      user.lastName +
-      " " +
-      "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
-      user.firstName +
-      " " +
-      user.lastName +
-      " Mobile Number: " +
-      user.mobileNumber +
-      "<br>" +
-      user.firstName +
-      " " +
-      user.lastName +
-      " Email: " +
-      user.email,
-    to: teamLeader.email,
-    from: process.env.NODEMAILER_EMAIL,
-  });
+  // sendEmail({
+  //   subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
+  //   text:
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " " +
+  //     "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " Mobile Number: " +
+  //     user.mobileNumber +
+  //     "<br>" +
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " Email: " +
+  //     user.email,
+  //   to: teamLeader.email,
+  //   from: process.env.NODEMAILER_EMAIL,
+  // });
 
   const mailOptions = {
     from: process.env.NODEMAILER_EMAIL,
