@@ -183,9 +183,9 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
 
   transporter.sendMail(mailOptions, function (err, success) {
     if (err) {
-      console.log("Error", err);
+      console.log("Email Error", err);
     } else {
-      console.log("E-Mail Sent Successfully!");
+      console.log("Email Success " + "E-Mail Sent Successfully!");
     }
   });
 
