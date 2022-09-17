@@ -26,6 +26,9 @@ const { generateTeamToken } = require("./utils");
 const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const { transporter } = require("../../utils/nodemailer");
 // const AWS = require("aws-sdk");
 
 exports.createTeam = catchAsync(async (req, res, next) => {
@@ -446,70 +449,24 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
     );
 
     const user = await User.findById({ _id: req.body.userId });
-    //   var params = {
-    //     Source: "mail@saisreekar.live",
-    //     Destination: {
-    //       ToAddresses: ["sai.sreekhar@gmail.com"], //teamLeader.email
-    //     },
-    //     ReplyToAddresses: ["godalasai.sreekar2021@vitstudent.ac.in"],
-    //     Message: {
-    //       Body: {
-    //         Html: {
-    //           Charset: "UTF-8",
-    //           Data:
-    //             user.firstName +
-    //             " " +
-    //             user.lastName +
-    //             " " +
-    //             "your request is accepted by team " +
-    //             team.teamName +
-    //             ".Click on the link to view the team. https://future-preneurs-22.vercel.app/.<br>",
-    //         },
-    //       },
-    //       Subject: {
-    //         Charset: "UTF-8",
-    //         Data: "Pending Request Approved",
-    //       },
-    //     },
-    //   };
-
-    //   new AWS.SES(SESConfig)
-    //     .sendEmail(params)
-    //     .promise()
-    //     .then((res) => {
-    //       console.log(res);
-    //     });
-
-    let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.USER,
-        pass: process.env.USER_PASSWORD,
-      },
-    });
-
-    let mailOptions = {
-      from: process.env.USER,
-      to: user.email,
-      subject: "ECELL-VIT. Request Approved By Team",
-      html:
+    transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: teuser.email,
+      subject: "FUTUREPRENEURS-ECELL-VIT. Request Approved By Team",
+      text:
         user.firstName +
         " " +
         user.lastName +
         " " +
         "your request is accepted by team " +
         team.teamName +
-        ".Click on the link to view the Team Details https://future-preneurs-22.vercel.app/.<br>",
-    };
-
-    transporter.sendMail(mailOptions, function (err, success) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("E-Mail Sent Successfully!");
-      }
+        ".Click on the link to view the Team Details https://future-preneurs-22.vercel.app/.",
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+        accessToken: process.env.NODEMAILER_REFRESH_TOKEN,
+        expires: 3599,
+      },
     });
   }
 

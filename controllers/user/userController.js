@@ -107,143 +107,6 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   );
 
   const teamLeader = await User.findById({ _id: team.teamLeaderId });
-  // var params = {
-  //   Source: "mail@saisreekar.live",
-  //   Destination: {
-  //     ToAddresses: ["sai.sreekhar@gmail.com"], //teamLeader.email
-  //   },
-  //   ReplyToAddresses: ["godalasai.sreekar2021@vitstudent.ac.in"],
-  //   Message: {
-  //     Body: {
-  //       Html: {
-  //         Charset: "UTF-8",
-  //         Data:
-  //           user.firstName +
-  //           " " +
-  //           user.lastName +
-  //           " " +
-  //           "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
-  //           user.firstName +
-  //           " " +
-  //           user.lastName +
-  //           " Mobile Number: " +
-  //           user.mobileNumber +
-  //           "<br>" +
-  //           user.firstName +
-  //           " " +
-  //           user.lastName +
-  //           " Email: " +
-  //           user.email,
-  //       },
-  //     },
-  //     Subject: {
-  //       Charset: "UTF-8",
-  //       Data: "Pending Approval from a User",
-  //     },
-  //   },
-  // };
-
-  // new AWS.SES(SESConfig)
-  //   .sendEmail(params)
-  //   .promise()
-  //   .then((res) => {
-  //     console.log(res);
-  //   });
-
-  // let transporter = nodemailer.createTransport({
-  //   host: "smtp.gmail.com",
-  //   port: 465,
-  //   secure: true,
-  //   auth: {
-  //     user: process.env.USER,
-  //     pass: process.env.USER_PASSWORD,
-  //   },
-  // });
-  // console.log("Transporter", transporter);
-  // console.log("Mail Options:", mailOptions);
-  // let mailOptions = {
-  //   from: process.env.USER,
-  //   to: teamLeader.email,
-  //   subject: "ECELL-VIT. Pending Approval From a Participant",
-  //   html:
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " " +
-  //     "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Mobile Number: " +
-  //     user.mobileNumber +
-  //     "<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Email: " +
-  //     user.email,
-  // };
-
-  // transporter.sendMail(mailOptions, function (err, success) {
-  //   if (err) {
-  //     console.log("Email Error", err);
-  //   } else {
-  //     console.log("Email Success " + "E-Mail Sent Successfully!");
-  //   }
-  // });
-
-  // sendEmail({
-  //   subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
-  //   text:
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " " +
-  //     "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Mobile Number: " +
-  //     user.mobileNumber +
-  //     "<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Email: " +
-  //     user.email,
-  //   to: teamLeader.email,
-  //   from: process.env.NODEMAILER_EMAIL,
-  // });
-
-  // const mailOptions = {
-  //   from: process.env.NODEMAILER_EMAIL,
-  //   to: teamLeader.email,
-  //   subject: "Node.js Email with Secure OAuth",
-  //   subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
-  //   generateTextFromHTML: true,
-  //   html:
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " " +
-  //     "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Mobile Number: " +
-  //     user.mobileNumber +
-  //     "<br>" +
-  //     user.firstName +
-  //     " " +
-  //     user.lastName +
-  //     " Email: " +
-  //     user.email,
-  // };
-
-  // smtpTransport.sendMail(mailOptions, (error, response) => {
-  //   error ? console.log(error) : console.log(response);
-  //   smtpTransport.close();
-  // });
 
   transporter.sendMail({
     from: process.env.NODEMAILER_EMAIL,
@@ -254,13 +117,12 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
       " " +
       user.lastName +
       " " +
-      "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
+      "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/." +
       user.firstName +
       " " +
       user.lastName +
       " Mobile Number: " +
       user.mobileNumber +
-      "<br>" +
       user.firstName +
       " " +
       user.lastName +
