@@ -27,6 +27,7 @@
     "express": "^4.18.1",
     "express-rate-limit": "^6.6.0",
     "google-auth-library": "^8.1.1",
+    "googleapis": "^107.0.0",
     "http-server": "^14.1.1",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",

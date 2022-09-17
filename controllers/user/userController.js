@@ -20,6 +20,9 @@ const {
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
 const client = new OAuth2Client(process.env.CLIENT_ID);
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const { sendEmail } = require("../../utils/nodemailer");
 // const AWS = require("aws-sdk");
 
 exports.sendRequest = catchAsync(async (req, res, next) => {
@@ -148,21 +151,51 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   //     console.log(res);
   //   });
 
-  let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.USER,
-      pass: process.env.USER_PASSWORD,
-    },
-  });
+  // let transporter = nodemailer.createTransport({
+  //   host: "smtp.gmail.com",
+  //   port: 465,
+  //   secure: true,
+  //   auth: {
+  //     user: process.env.USER,
+  //     pass: process.env.USER_PASSWORD,
+  //   },
+  // });
+  // console.log("Transporter", transporter);
+  // console.log("Mail Options:", mailOptions);
+  // let mailOptions = {
+  //   from: process.env.USER,
+  //   to: teamLeader.email,
+  //   subject: "ECELL-VIT. Pending Approval From a Participant",
+  //   html:
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " " +
+  //     "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " Mobile Number: " +
+  //     user.mobileNumber +
+  //     "<br>" +
+  //     user.firstName +
+  //     " " +
+  //     user.lastName +
+  //     " Email: " +
+  //     user.email,
+  // };
 
-  let mailOptions = {
-    from: process.env.USER,
-    to: teamLeader.email,
-    subject: "ECELL-VIT. Pending Approval From a Participant",
-    html:
+  // transporter.sendMail(mailOptions, function (err, success) {
+  //   if (err) {
+  //     console.log("Email Error", err);
+  //   } else {
+  //     console.log("Email Success " + "E-Mail Sent Successfully!");
+  //   }
+  // });
+
+  sendEmail({
+    subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
+    text:
       user.firstName +
       " " +
       user.lastName +
@@ -179,14 +212,8 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
       user.lastName +
       " Email: " +
       user.email,
-  };
-
-  transporter.sendMail(mailOptions, function (err, success) {
-    if (err) {
-      console.log("Email Error", err);
-    } else {
-      console.log("Email Success " + "E-Mail Sent Successfully!");
-    }
+    to: teamLeader.email,
+    from: process.env.NODEMAILER_EMAIL,
   });
 
   res.status(201).json({
