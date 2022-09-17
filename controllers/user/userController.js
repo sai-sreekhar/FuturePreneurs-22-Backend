@@ -4,6 +4,7 @@ const Team = require("../../models/teamModel");
 const PendingApprovalsModel = require("../../models/pendingApprovalsModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
+const nodemailer = require("nodemailer");
 const {
   errorCodes,
   requestStatusTypes,
@@ -103,7 +104,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     }
   );
 
-  // const teamLeader = await User.findById({ _id: team.teamLeaderId });
+  const teamLeader = await User.findById({ _id: team.teamLeaderId });
   // var params = {
   //   Source: "mail@saisreekar.live",
   //   Destination: {
@@ -146,6 +147,47 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   //   .then((res) => {
   //     console.log(res);
   //   });
+
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.USER,
+      pass: process.env.USER_PASSWORD,
+    },
+  });
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: teamLeader.email,
+    subject: "ECELL-VIT. Pending Approval From a Participant",
+    html:
+      user.firstName +
+      " " +
+      user.lastName +
+      " " +
+      "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/.<br>" +
+      user.firstName +
+      " " +
+      user.lastName +
+      " Mobile Number: " +
+      user.mobileNumber +
+      "<br>" +
+      user.firstName +
+      " " +
+      user.lastName +
+      " Email: " +
+      user.email,
+  };
+
+  transporter.sendMail(mailOptions, function (err, success) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("E-Mail Sent Successfully!");
+    }
+  });
 
   res.status(201).json({
     message: "Sent request successfully",
