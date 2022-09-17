@@ -118,11 +118,13 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
       user.lastName +
       " " +
       "has sent a request to join your team.To Approve or reject the request click on the link https://future-preneurs-22.vercel.app/." +
+      " " +
       user.firstName +
       " " +
       user.lastName +
       " Mobile Number: " +
       user.mobileNumber +
+      ", " +
       user.firstName +
       " " +
       user.lastName +
