@@ -21,6 +21,7 @@ const requestStatusTypes = {
   LEFT_TEAM: 5,
   REMOVED_FROM_TEAM: 6,
   JOINED_VIA_TOKEN: 7,
+  TEAM_DELETED: 8,
 };
 
 const approvalStatusTypes = {

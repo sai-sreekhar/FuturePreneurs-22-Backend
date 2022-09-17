@@ -4,7 +4,6 @@ const PendingApprovalsModel = require("../../models/pendingApprovalsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-const nodemailer = require("nodemailer");
 const {
   errorCodes,
   requestStatusTypes,
@@ -236,6 +235,16 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
       )
     );
   }
+
+  await PendingApprovalsModel.findOneAndUpdate(
+    {
+      teamId: req.params.teamId,
+      status: requestStatusTypes.PENDING_APPROVAL,
+    },
+    {
+      $set: { status: requestStatusTypes.TEAM_DELETED },
+    }
+  );
 
   await Team.findOneAndDelete({
     _id: req.params.teamId,
