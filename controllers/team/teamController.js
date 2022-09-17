@@ -451,7 +451,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
     const user = await User.findById({ _id: req.body.userId });
     transporter.sendMail({
       from: process.env.NODEMAILER_EMAIL,
-      to: teuser.email,
+      to: user.email,
       subject: "FUTUREPRENEURS-ECELL-VIT. Request Approved By Team",
       text:
         user.firstName +
