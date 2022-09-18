@@ -247,15 +247,19 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
     }
   );
 
-  await PendingApprovalsModel.updateMany(
-    {
-      teamId: req.params.teamId,
-      status: requestStatusTypes.PENDING_APPROVAL,
-    },
-    {
-      $set: { status: requestStatusTypes.TEAM_DELETED },
-    }
-  );
+  // await PendingApprovalsModel.updateMany(
+  //   {
+  //     teamId: req.params.teamId,
+  //     status: requestStatusTypes.PENDING_APPROVAL,
+  //   },
+  //   {
+  //     $set: { status: requestStatusTypes.TEAM_DELETED },
+  //   }
+  // );
+
+  await PendingApprovalsModel.deleteMany({
+    teamId: req.params.teamId,
+  });
 
   let userIdsArr = [];
   for (let i = 0; i < userIds.length; i++) {
