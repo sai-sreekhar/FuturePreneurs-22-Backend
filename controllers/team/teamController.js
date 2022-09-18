@@ -603,6 +603,26 @@ exports.removeMember = catchAsync(async (req, res, next) => {
     }
   );
 
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: userToRemove.email,
+    subject: "FUTUREPRENEURS-ECELL-VIT. Removed From Team",
+    text:
+      userToRemove.firstName +
+      " " +
+      userToRemove.lastName +
+      " " +
+      "you have been removed from the team " +
+      team.teamName +
+      ".To Join or create a new Team click on the link https://future-preneurs-22.vercel.app/.",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      expires: 3599,
+    },
+  });
+
   res.status(201).json({
     message: "User Removed Successfully",
   });
