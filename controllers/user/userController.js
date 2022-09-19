@@ -310,6 +310,7 @@ exports.hasFilledDetails = catchAsync(async (req, res, next) => {
 
   return res.status(201).json({
     message: "Checking User Successfull",
+    teamId: user.teamId,
     hasFilledDetails: user.hasFilledDetails,
   });
 });
