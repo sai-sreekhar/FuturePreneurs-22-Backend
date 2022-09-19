@@ -112,19 +112,21 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     from: process.env.NODEMAILER_EMAIL,
     to: teamLeader.email,
     subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
-    text:
+    html:
       user.firstName +
       " " +
       user.lastName +
       " " +
-      "has sent a request to join your team.To Approve or reject the request click on the link https://fp.ecellvit.com/" +
-      " " +
+      "has sent a request to join your team " +
+      team.teamName +
+      ".<br>" +
+      "To Approve or reject the request click on the link https://fp.ecellvit.com/.<br>" +
       user.firstName +
       " " +
       user.lastName +
       " Mobile Number: " +
       user.mobileNumber +
-      ", " +
+      "<br>" +
       user.firstName +
       " " +
       user.lastName +
