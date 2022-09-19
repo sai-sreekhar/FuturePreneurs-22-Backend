@@ -498,7 +498,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
         " " +
         user.lastName +
         " " +
-        "your request is accepted by team " +
+        "your request is approved by team " +
         team.teamName +
         ".<br>" +
         "Click on the link to view the team details https://future-preneurs-22.vercel.app/.<br>",
