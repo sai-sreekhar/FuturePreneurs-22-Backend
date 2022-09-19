@@ -500,7 +500,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
         " " +
         "your request is accepted by team " +
         team.teamName +
-        ".Click on the link to view the Team Details https://future-preneurs-22.vercel.app/.",
+        ".Click on the link to view the Team Details https://fp.ecellvit.com/",
       auth: {
         user: process.env.NODEMAILER_EMAIL,
         refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
@@ -614,7 +614,7 @@ exports.removeMember = catchAsync(async (req, res, next) => {
       " " +
       "you have been removed from the team " +
       team.teamName +
-      ".To Join or create a new Team click on the link https://future-preneurs-22.vercel.app/.",
+      ".To Join or create a new Team click on the link https://fp.ecellvit.com/",
     auth: {
       user: process.env.NODEMAILER_EMAIL,
       refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
