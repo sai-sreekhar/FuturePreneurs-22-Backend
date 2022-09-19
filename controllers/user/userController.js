@@ -124,13 +124,13 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
       user.firstName +
       " " +
       user.lastName +
-      " Mobile Number: " +
+      "'s Mobile Number: " +
       user.mobileNumber +
       "<br>" +
       user.firstName +
       " " +
       user.lastName +
-      " Email: " +
+      "'s Email: " +
       user.email,
     auth: {
       user: process.env.NODEMAILER_EMAIL,
