@@ -155,21 +155,12 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
     );
   }
 
-  //checking if team name is already taken
-  const teamName = await Team.findOne({ teamName: req.body.teamName });
-  if (teamName) {
-    return next(
-      new AppError("TeamName already exists", 412, errorCodes.TEAM_NAME_EXISTS)
-    );
-  }
-
   if (req.params.teamId.length !== objectIdLength) {
     return next(
       new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
     );
   }
 
-  //validating teamid
   const team = await Team.findById({ _id: req.params.teamId });
 
   if (!team) {
@@ -178,11 +169,46 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
     );
   }
 
+  //validating teamid
+  if (team.noOfTimesTeamNameChanged === 3) {
+    return next(
+      new AppError(
+        "Time Name Has Been Changed Already 3 Times(Limit Exceeded) ",
+        412,
+        errorCodes.UPDATE_TEAMNAME_LIMIT_EXCEEDED
+      )
+    );
+  }
+
+  //checking if team name is already taken
+  const teamWithNewTeamName = await Team.findOne({
+    teamName: req.body.teamName,
+  });
+
+  if (teamWithNewTeamName && teamWithNewTeamName.teamName === team.teamName) {
+    return next(
+      new AppError(
+        "New TeamName Matched with Existing TeamName",
+        412,
+        errorCodes.SAME_EXISTING_TEAMNAME
+      )
+    );
+  }
+  if (teamWithNewTeamName) {
+    return next(
+      new AppError(
+        "New TeamName Already Exists",
+        412,
+        errorCodes.TEAM_NAME_EXISTS
+      )
+    );
+  }
+
   //check whether user belongs to the given team and role
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
@@ -191,11 +217,17 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
 
   await Team.updateOne(
     { _id: req.params.teamId },
-    { $set: { teamName: req.body.teamName } }
+    {
+      $set: {
+        teamName: req.body.teamName,
+      },
+      $inc: { noOfTimesTeamNameChanged: 1 },
+    }
   );
 
   res.status(201).json({
-    message: "Team updated successfully",
+    message: "TeamName updated successfully",
+    teamId: team._id,
   });
 });
 

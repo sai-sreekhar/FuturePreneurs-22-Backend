@@ -9,6 +9,10 @@ const teamSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",
     },
+    noOfTimesTeamNameChanged: {
+      type: Number,
+      default: 0,
+    },
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,
