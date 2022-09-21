@@ -135,7 +135,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     auth: {
       user: process.env.NODEMAILER_EMAIL,
       refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
-      accessToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
       expires: 3599,
     },
   });

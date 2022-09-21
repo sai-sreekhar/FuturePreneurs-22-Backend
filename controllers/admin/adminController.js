@@ -60,13 +60,13 @@ exports.sendEmails = catchAsync(async (req, res, next) => {
 
   transporter.sendMail({
     from: process.env.NODEMAILER_EMAIL,
-    to: userEmails,
+    to: "godalasai.sreekar2021@vitstudent.ac.in",
     subject: "FUTUREPRENEURS-ECELL-VIT.",
     html: "Hello Futurepreneur,<br> We hope you are having a great time during this pre-graVITas season.<br> Thank you for showing interest and enthusiasm for our flagship event FuturePreneurs 8.0. You have taken the first step by becoming a part of our whatsapp group.<br>Make sure you have registered on our official website and created or joined a team.<br> In case you haven't, go to http://fp.ecellvit.com/dashboard<br> You can directly join or find a team!<br> Whatsapp group link : https://chat.whatsapp.com/LNZVaG2PndRFuQFyCJUDGD<br> We hope to see you soon at our fascinating event and get an amazing learning experience about the entrepreneurial world.<br>Best of luck!<br> Team E-Cell<br>",
     auth: {
       user: process.env.NODEMAILER_EMAIL,
       refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
-      accessToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
       expires: 3599,
     },
   });
