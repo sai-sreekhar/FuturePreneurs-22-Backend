@@ -11,7 +11,15 @@ module.exports = {
       if (!page && !limit) {
         try {
           const results = {};
-          results.results = await teamModel.find({}, { teamName: 1 });
+          results.results = await teamModel.find(
+            {
+              $expr: {
+                $lt: [{ $size: { $ifNull: ["$members", []] } }, 4],
+              },
+            },
+            { teamName: 1 }
+          );
+
           res.paginatedResults = results;
           next();
         } catch (e) {
@@ -40,7 +48,14 @@ module.exports = {
 
       try {
         results.results = await teamModel
-          .find({}, { completedQuestions: 0 })
+          .find(
+            {
+              $expr: {
+                $lt: [{ $size: { $ifNull: ["$members", []] } }, 4],
+              },
+            },
+            { completedQuestions: 0 }
+          )
           .populate("members", {
             email: 1,
             firstName: 1,
