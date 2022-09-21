@@ -16,6 +16,25 @@ const {
   modifyQuestionBodyValidation,
 } = require("./validationSchema");
 const TeamModel = require("../../models/teamModel");
+const UserModel = require("../../models/userModel");
+
+exports.getUsersCount = catchAsync(async (req, res, next) => {
+  const users = await UserModel.find();
+
+  res.status(201).json({
+    message: "Users Length Sent Successfully",
+    usersCount: users.length,
+  });
+});
+
+exports.getTeamsCount = catchAsync(async (req, res, next) => {
+  const teams = await TeamModel.find();
+
+  res.status(201).json({
+    message: "Teams Length Sent Successfully",
+    teamsCount: teams.length,
+  });
+});
 
 exports.setQuestion = catchAsync(async (req, res, next) => {
   const { error } = setQuestionBodyValidation(req.body);

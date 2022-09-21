@@ -18,5 +18,7 @@ adminRouter
 adminRouter
   .route("/question/:questionId")
   .delete(auth, adminController.deleteQuestion);
+adminRouter.route("/user").get(adminController.getUsersCount);
+adminRouter.route("/team").get(adminController.getTeamsCount);
 
 module.exports = adminRouter;
