@@ -20,6 +20,47 @@ const UserModel = require("../../models/userModel");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const { transporter } = require("../../utils/nodemailer");
+const mailer = require("nodemailer");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
+  process.env.NODEMAILER_CLIENT_ID,
+  process.env.NODEMAILER_CLIENT_SECRET,
+  "https://developers.google.com/oauthplayground"
+);
+
+oauth2Client.setCredentials({
+  refresh_token: process.env.NODEMAILER_REFRESH_TOKEN,
+});
+
+const accessToken = oauth2Client.getAccessToken();
+async function sendEmail(user) {
+  let transporter = mailer.createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user: process.env.NODEMAILER_EMAIL,
+      clientId: process.env.NODEMAILER_CLIENT_ID,
+      clientSecret: process.env.NODEMAILER_CLIENT_SECRET,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: accessToken,
+    },
+  });
+  try {
+    let info = await transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: String(user),
+      subject: "FUTUREPRENEURS-ECELL-VIT",
+      html: "Hello Futurepreneur,<br> We hope you are having a great time during this pre-graVITas season.<br> Thank you for showing interest and enthusiasm for our flagship event FuturePreneurs 8.0. You have taken the first step by becoming a part of our whatsapp group.<br>Make sure you have registered on our official website and created or joined a team.<br> In case you haven't, go to http://fp.ecellvit.com/dashboard<br> You can directly join or find a team!<br> Whatsapp group link : https://chat.whatsapp.com/LNZVaG2PndRFuQFyCJUDGD<br> We hope to see you soon at our fascinating event and get an amazing learning experience about the entrepreneurial world.<br>Best of luck!<br> Team E-Cell<br>",
+    });
+    console.log(user);
+    console.log("Message Sent : %s", info.messageId);
+    console.log("Preview URL: %s", mailer.getTestMessageUrl(info));
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 exports.getUsersCount = catchAsync(async (req, res, next) => {
   const users = await UserModel.find();
@@ -53,25 +94,11 @@ exports.sendEmails = catchAsync(async (req, res, next) => {
     }
   );
 
-  let userEmails = [];
-  for (let i = 0; i < users.length; i++) {
-    userEmails.push(users[i].email);
-  }
-
-  transporter.sendMail({
-    from: process.env.NODEMAILER_EMAIL,
-    to: userEmails,
-    subject: "FUTUREPRENEURS-ECELL-VIT.",
-    html: "Hello Futurepreneur,<br> We hope you are having a great time during this pre-graVITas season.<br> Thank you for showing interest and enthusiasm for our flagship event FuturePreneurs 8.0. You have taken the first step by becoming a part of our whatsapp group.<br>Make sure you have registered on our official website and created or joined a team.<br> In case you haven't, go to http://fp.ecellvit.com/dashboard<br> You can directly join or find a team!<br> Whatsapp group link : https://chat.whatsapp.com/LNZVaG2PndRFuQFyCJUDGD<br> We hope to see you soon at our fascinating event and get an amazing learning experience about the entrepreneurial world.<br>Best of luck!<br> Team E-Cell<br>",
-    auth: {
-      user: process.env.NODEMAILER_EMAIL,
-      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
-      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
-      expires: 3599,
-    },
-  });
-
-  console.log(userEmails);
+  // for (const i in userEmails) {
+  //   const mail = userEmails[i];
+  await sendEmail("saisrikar.svs@gmail.com");
+  // }
+  // console.log(userEmails);
   res.status(201).json({
     message: "Emails Sent Successfully",
     usersLength: users.length,

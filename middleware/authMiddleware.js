@@ -22,7 +22,7 @@ const auth = async (req, res, next) => {
     if (!user) {
       return next(
         new AppError(
-          "Access Denied: Invalid Token",
+          "Please SignOut and SignIn Again",
           403,
           errorCodes.INVALID_TOKEN
         )
@@ -34,7 +34,7 @@ const auth = async (req, res, next) => {
     console.log(err);
     return next(
       new AppError(
-        "Access Denied: Invalid Token",
+        "Please SignOut and SignIn Again",
         403,
         errorCodes.INVALID_TOKEN
       )

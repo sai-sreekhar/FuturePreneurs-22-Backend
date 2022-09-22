@@ -300,12 +300,12 @@ exports.hasFilledDetails = catchAsync(async (req, res, next) => {
   });
 
   if (!ticket) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
   }
 
   const { email } = ticket.getPayload();
   if (email !== emailFromClient) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
   }
 
   const user = await User.findOne({ email: emailFromClient });
