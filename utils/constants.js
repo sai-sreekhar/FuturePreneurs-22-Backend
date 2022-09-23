@@ -1,3 +1,6 @@
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
 const loginType = {
   GOOGLE_LOGIN: 0,
   BASIC_LOGIN: 1,
@@ -18,6 +21,7 @@ const requestStatusTypes = {
   LEFT_TEAM: 5,
   REMOVED_FROM_TEAM: 6,
   JOINED_VIA_TOKEN: 7,
+  TEAM_DELETED: 8,
 };
 
 const approvalStatusTypes = {
@@ -52,7 +56,16 @@ const errorCodes = {
   INVALID_QUESTION_ID: 23,
   NO_DATA_FOUND: 24,
   PENDING_REQUESTS_LIMIT_REACHED: 25,
+  SAME_EXISTING_TEAMNAME: 26,
+  UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
 };
+
+// const SESConfig = {
+//   apiVersion: "2010-12-01",
+//   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SES_SECRET_KEY,
+//   region: process.env.AWS_SES_REGION,
+// };
 
 const objectIdLength = 24;
 const noOfQuestionsToAnswer = 15;
@@ -67,4 +80,5 @@ module.exports = {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
+  // SESConfig,
 };

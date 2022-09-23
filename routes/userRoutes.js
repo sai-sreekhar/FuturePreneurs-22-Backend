@@ -4,8 +4,8 @@ const userRouter = express.Router();
 const auth = require("../middleware/authMiddleware");
 
 userRouter.route("/").put(auth, userController.fillUserDetails);
-userRouter.route("/").get(userController.hasFilledDetails);
-userRouter.route("/").patch(auth, userController.updateUser);
+userRouter.route("/").patch(userController.hasFilledDetails);
+// userRouter.route("/").patch(auth, userController.updateUser);
 
 userRouter.route("/requests").get(auth, userController.getRequest);
 userRouter.route("/requests/:teamId").post(auth, userController.sendRequest);

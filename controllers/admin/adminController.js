@@ -16,6 +16,68 @@ const {
   modifyQuestionBodyValidation,
 } = require("./validationSchema");
 const TeamModel = require("../../models/teamModel");
+const UserModel = require("../../models/userModel");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const { transporter } = require("../../utils/nodemailer");
+
+exports.getUsersCount = catchAsync(async (req, res, next) => {
+  const users = await UserModel.find();
+
+  res.status(201).json({
+    message: "Users Length Sent Successfully",
+    usersCount: users.length,
+  });
+});
+
+exports.getTeamsCount = catchAsync(async (req, res, next) => {
+  const teams = await TeamModel.find();
+
+  res.status(201).json({
+    message: "Teams Length Sent Successfully",
+    teamsCount: teams.length,
+  });
+});
+
+exports.sendEmails = catchAsync(async (req, res, next) => {
+  const users = await UserModel.find(
+    {
+      date: {
+        $lt: 1663778298087,
+      },
+      teamId: null,
+    },
+    {
+      email: 1,
+      _id: 0,
+    }
+  );
+
+  let userEmails = [];
+  for (let i = 0; i < users.length; i++) {
+    userEmails.push(users[i].email);
+  }
+
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: userEmails,
+    subject: "FUTUREPRENEURS-ECELL-VIT.",
+    html: "Hello Futurepreneur,<br> We hope you are having a great time during this pre-graVITas season.<br> Thank you for showing interest and enthusiasm for our flagship event FuturePreneurs 8.0. You have taken the first step by becoming a part of our whatsapp group.<br>Make sure you have registered on our official website and created or joined a team.<br> In case you haven't, go to http://fp.ecellvit.com/dashboard<br> You can directly join or find a team!<br> Whatsapp group link : https://chat.whatsapp.com/LNZVaG2PndRFuQFyCJUDGD<br> We hope to see you soon at our fascinating event and get an amazing learning experience about the entrepreneurial world.<br>Best of luck!<br> Team E-Cell<br>",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
+      expires: 3599,
+    },
+  });
+
+  console.log(userEmails);
+  res.status(201).json({
+    message: "Emails Sent Successfully",
+    usersLength: users.length,
+    users,
+  });
+});
 
 exports.setQuestion = catchAsync(async (req, res, next) => {
   const { error } = setQuestionBodyValidation(req.body);

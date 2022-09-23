@@ -9,6 +9,7 @@ const {
   requestStatusTypes,
   teamRole,
   objectIdLength,
+  // SESConfig,
 } = require("../../utils/constants");
 const {
   updateUserBodyValidation,
@@ -18,6 +19,10 @@ const {
 } = require("./validationSchema");
 const { verifyTeamToken } = require("./utils");
 const client = new OAuth2Client(process.env.CLIENT_ID);
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const { transporter } = require("../../utils/nodemailer");
+// const AWS = require("aws-sdk");
 
 exports.sendRequest = catchAsync(async (req, res, next) => {
   const user = await User.findById({ _id: req.user._id });
@@ -41,7 +46,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   if (user.noOfPendingRequests >= 5) {
     return next(
       new AppError(
-        "Already 5 Requests are Pending.",
+        "Can't send more than 5 requests",
         412,
         errorCodes.PENDING_REQUESTS_LIMIT_REACHED
       )
@@ -52,7 +57,7 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -101,6 +106,39 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     }
   );
 
+  const teamLeader = await User.findById({ _id: team.teamLeaderId });
+
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: teamLeader.email,
+    subject: "FUTUREPRENEURS-ECELL-VIT. Pending Approval From a Participant",
+    html:
+      user.firstName +
+      " " +
+      user.lastName +
+      " " +
+      "has sent a request to join your team " +
+      team.teamName +
+      ".<br>" +
+      "To Approve or reject the request click on the link https://fp.ecellvit.com/.<br>" +
+      user.firstName +
+      " " +
+      user.lastName +
+      "'s Mobile Number: " +
+      user.mobileNumber +
+      "<br>" +
+      user.firstName +
+      " " +
+      user.lastName +
+      "'s Email: " +
+      user.email,
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
+      expires: 3599,
+    },
+  });
   res.status(201).json({
     message: "Sent request successfully",
     requestId: newRequest._id,
@@ -114,7 +152,7 @@ exports.getRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -126,15 +164,15 @@ exports.getRequest = catchAsync(async (req, res, next) => {
     status: requestStatusTypes.PENDING_APPROVAL,
   }).populate({
     path: "teamId",
-    select: "teamId",
+    select: "teamName teamLeaderId members",
     populate: {
-      path: "teamLeaderId",
-      select: "email firstName lastName regNo mobileNumber",
+      path: "teamName teamLeaderId",
+      select: "email firstName lastName regNo mobileNumber teamRole",
     },
   });
 
   res.status(200).json({
-    message: "Get user requests successfull",
+    message: "Get User Requests Successfull",
     requests,
   });
 });
@@ -162,7 +200,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -179,7 +217,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   if (!request) {
     return next(
       new AppError(
-        "No pending request found",
+        "No Pending Request Found",
         412,
         errorCodes.NO_PENDING_REQUESTS
       )
@@ -187,7 +225,11 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   }
 
   await PendingApprovalsModel.updateOne(
-    { userId: req.user._id, teamId: req.params.teamId },
+    {
+      userId: req.user._id,
+      teamId: req.params.teamId,
+      status: requestStatusTypes.PENDING_APPROVAL,
+    },
     { $set: { status: requestStatusTypes.REQUEST_TAKEN_BACK } }
   );
 
@@ -201,7 +243,7 @@ exports.removeRequest = catchAsync(async (req, res, next) => {
   );
 
   res.status(201).json({
-    message: "Removed request successfully",
+    message: "Removed Request Successfully",
   });
 });
 
@@ -258,18 +300,19 @@ exports.hasFilledDetails = catchAsync(async (req, res, next) => {
   });
 
   if (!ticket) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
   }
 
   const { email } = ticket.getPayload();
   if (email !== emailFromClient) {
-    return next(new AppError("Invalid Token", 401, errorCodes.INVALID_TOKEN));
+    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
   }
 
   const user = await User.findOne({ email: emailFromClient });
 
   return res.status(201).json({
     message: "Checking User Successfull",
+    teamId: user.teamId,
     hasFilledDetails: user.hasFilledDetails,
   });
 });
@@ -348,7 +391,7 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
   if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
     return next(
       new AppError(
-        "User is not part of given teamID or user isn't part of any team",
+        "User is not part of given TeamID or user isn't part of any Team",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID
       )
@@ -358,7 +401,11 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
   //check the role. Leader can leave team remove members and delete team.
   if (user.teamRole === teamRole.LEADER) {
     return next(
-      new AppError("User is a Leader", 412, errorCodes.USER_IS_LEADER)
+      new AppError(
+        "Leader can't Leave the Team",
+        412,
+        errorCodes.USER_IS_LEADER
+      )
     );
   }
 
@@ -376,7 +423,10 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
     {
       userId: req.user._id,
       teamId: req.params.teamId,
-      status: requestStatusTypes.APPROVED,
+      $or: [
+        { status: requestStatusTypes.APPROVED },
+        { status: requestStatusTypes.JOINED_VIA_TOKEN },
+      ],
     },
     {
       $set: { status: requestStatusTypes.LEFT_TEAM },
@@ -385,7 +435,7 @@ exports.leaveTeam = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     error: false,
-    message: "Leaving team successfull",
+    message: "Leaving Team Successfull",
   });
 });
 
@@ -408,7 +458,7 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
   if (user.teamId) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -428,7 +478,13 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
         {
           _id: req.user._id,
         },
-        { $set: { teamId: team._id, teamRole: teamRole.MEMBER } }
+        {
+          $set: {
+            teamId: team._id,
+            teamRole: teamRole.MEMBER,
+            noOfPendingRequests: 0,
+          },
+        }
       );
 
       //updating pending approvals model of particular team id to a status
@@ -461,7 +517,7 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
       );
 
       res.status(201).json({
-        message: "Joined team successfully",
+        message: "Joined Team Successfully",
         teamId: team._id,
       });
     })
@@ -477,7 +533,14 @@ exports.joinTeamViaToken = catchAsync(async (req, res, next) => {
 exports.getTeam = catchAsync(async (req, res, next) => {
   const user = await User.findById(
     { _id: req.user._id },
-    { name: 1, email: 1, mobileNumber: 1 }
+    {
+      email: 1,
+      firstName: 1,
+      lastName: 1,
+      regNo: 1,
+      mobileNumber: 1,
+      teamRole: 1,
+    }
   ).populate({
     path: "teamId",
     select: { teamName: 1 },
@@ -496,7 +559,7 @@ exports.getTeam = catchAsync(async (req, res, next) => {
   });
 
   res.status(200).json({
-    message: "Getting user team details successfull",
+    message: "Getting User Team Details Successfull",
     user,
   });
 });

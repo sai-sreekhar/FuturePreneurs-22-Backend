@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 const AppError = require("../utils/appError");
 const { errorCodes } = require("../utils/constants");
 
@@ -17,13 +18,23 @@ const auth = async (req, res, next) => {
 
   try {
     const tokenDetails = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById({ _id: tokenDetails._id });
+    if (!user) {
+      return next(
+        new AppError(
+          "Please SignOut and SignIn Again",
+          403,
+          errorCodes.INVALID_TOKEN
+        )
+      );
+    }
     req.user = tokenDetails;
     next();
   } catch (err) {
     console.log(err);
     return next(
       new AppError(
-        "Access Denied: Invalid Token",
+        "Please SignOut and SignIn Again",
         403,
         errorCodes.INVALID_TOKEN
       )

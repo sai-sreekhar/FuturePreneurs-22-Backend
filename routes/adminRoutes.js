@@ -1,4 +1,5 @@
 const express = require("express");
+const { admin } = require("googleapis/build/src/apis/admin");
 const adminController = require("../controllers/admin/adminController");
 const auth = require("../middleware/authMiddleware");
 const adminRouter = express.Router();
@@ -18,5 +19,9 @@ adminRouter
 adminRouter
   .route("/question/:questionId")
   .delete(auth, adminController.deleteQuestion);
+
+adminRouter.route("/user").get(adminController.getUsersCount);
+adminRouter.route("/team").get(adminController.getTeamsCount);
+adminRouter.route("/email").get(adminController.sendEmails);
 
 module.exports = adminRouter;

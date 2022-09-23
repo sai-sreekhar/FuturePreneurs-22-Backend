@@ -12,6 +12,7 @@ const {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
+  // SESConfig,
 } = require("../../utils/constants");
 const {
   createTeamBodyValidation,
@@ -24,6 +25,10 @@ const { generateTeamToken } = require("./utils");
 const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const { transporter } = require("../../utils/nodemailer");
+// const AWS = require("aws-sdk");
 
 exports.createTeam = catchAsync(async (req, res, next) => {
   //body validation
@@ -44,7 +49,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   const team = await Team.findOne({ teamName: req.body.teamName });
   if (team) {
     return next(
-      new AppError("TeamName already exists", 412, errorCodes.TEAM_NAME_EXISTS)
+      new AppError("TeamName Already Exists", 412, errorCodes.TEAM_NAME_EXISTS)
     );
   }
 
@@ -52,7 +57,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   if (user.teamId || user.teamRole) {
     return next(
       new AppError(
-        "User already part of a team",
+        "User Already Part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -68,7 +73,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   if (request) {
     return next(
       new AppError(
-        "User has pending requests",
+        "Remove Requests Sent to other Teams to Create a NewTeam",
         412,
         errorCodes.USER_HAS_PENDING_REQUESTS
       )
@@ -87,7 +92,7 @@ exports.createTeam = catchAsync(async (req, res, next) => {
   );
 
   res.status(201).json({
-    message: "Team created successfully",
+    message: "New Team Created Successfully",
     teamId: newTeam._id,
   });
 });
@@ -121,18 +126,18 @@ exports.getTeamDetails = catchAsync(async (req, res, next) => {
   }
 
   //check if user is part of given team
-  if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
-    return next(
-      new AppError(
-        "User is not part of given teamID or user isn't part of any team",
-        412,
-        errorCodes.INVALID_USERID_FOR_TEAMID
-      )
-    );
-  }
+  // if (user.teamId == null || user.teamId.toString() !== req.params.teamId) {
+  //   return next(
+  //     new AppError(
+  //       "User is not part of given teamID or user isn't part of any team",
+  //       412,
+  //       errorCodes.INVALID_USERID_FOR_TEAMID
+  //     )
+  //   );
+  // }
 
   res.status(200).json({
-    message: "Getting team details successfull",
+    message: "Getting Team Details Successfull",
     team,
   });
 });
@@ -150,21 +155,12 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
     );
   }
 
-  //checking if team name is already taken
-  const teamName = await Team.findOne({ teamName: req.body.teamName });
-  if (teamName) {
-    return next(
-      new AppError("TeamName already exists", 412, errorCodes.TEAM_NAME_EXISTS)
-    );
-  }
-
   if (req.params.teamId.length !== objectIdLength) {
     return next(
       new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
     );
   }
 
-  //validating teamid
   const team = await Team.findById({ _id: req.params.teamId });
 
   if (!team) {
@@ -173,11 +169,46 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
     );
   }
 
+  //validating teamid
+  if (team.noOfTimesTeamNameChanged === 3) {
+    return next(
+      new AppError(
+        "Time Name Has Been Changed Already 3 Times(Limit Exceeded) ",
+        412,
+        errorCodes.UPDATE_TEAMNAME_LIMIT_EXCEEDED
+      )
+    );
+  }
+
+  //checking if team name is already taken
+  const teamWithNewTeamName = await Team.findOne({
+    teamName: req.body.teamName,
+  });
+
+  if (teamWithNewTeamName && teamWithNewTeamName.teamName === team.teamName) {
+    return next(
+      new AppError(
+        "New TeamName Matched with Existing TeamName",
+        412,
+        errorCodes.SAME_EXISTING_TEAMNAME
+      )
+    );
+  }
+  if (teamWithNewTeamName) {
+    return next(
+      new AppError(
+        "New TeamName Already Exists",
+        412,
+        errorCodes.TEAM_NAME_EXISTS
+      )
+    );
+  }
+
   //check whether user belongs to the given team and role
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
@@ -186,11 +217,17 @@ exports.updateTeam = catchAsync(async (req, res, next) => {
 
   await Team.updateOne(
     { _id: req.params.teamId },
-    { $set: { teamName: req.body.teamName } }
+    {
+      $set: {
+        teamName: req.body.teamName,
+      },
+      $inc: { noOfTimesTeamNameChanged: 1 },
+    }
   );
 
   res.status(201).json({
-    message: "Team updated successfully",
+    message: "TeamName updated successfully",
+    teamId: team._id,
   });
 });
 
@@ -213,7 +250,7 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
@@ -224,12 +261,53 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
   if (team.members.length !== 1) {
     return next(
       new AppError(
-        "Teamsize more than 1",
+        "Teamsize more than 1. Remove TeamMembers and Delete the Team",
         412,
         errorCodes.TEAMSIZE_MORE_THAN_ONE
       )
     );
   }
+
+  const userIds = await PendingApprovalsModel.find(
+    {
+      teamId: req.params.teamId,
+      status: requestStatusTypes.PENDING_APPROVAL,
+    },
+    {
+      userId: 1,
+      _id: 0,
+    }
+  );
+
+  // await PendingApprovalsModel.updateMany(
+  //   {
+  //     teamId: req.params.teamId,
+  //     status: requestStatusTypes.PENDING_APPROVAL,
+  //   },
+  //   {
+  //     $set: { status: requestStatusTypes.TEAM_DELETED },
+  //   }
+  // );
+
+  await PendingApprovalsModel.deleteMany({
+    teamId: req.params.teamId,
+  });
+
+  let userIdsArr = [];
+  for (let i = 0; i < userIds.length; i++) {
+    userIdsArr.push(JSON.stringify(userIds[i].userId).slice(1, -1));
+  }
+
+  await User.updateMany(
+    {
+      _id: {
+        $in: userIdsArr,
+      },
+    },
+    {
+      $inc: { noOfPendingRequests: -1 },
+    }
+  );
 
   await Team.findOneAndDelete({
     _id: req.params.teamId,
@@ -241,7 +319,7 @@ exports.deleteTeam = catchAsync(async (req, res, next) => {
   );
 
   res.status(200).json({
-    message: "Team deleted successfully",
+    message: "Team Deleted Successfully",
   });
 });
 
@@ -266,7 +344,7 @@ exports.getTeamRequests = catchAsync(async (req, res, next) => {
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
@@ -285,7 +363,7 @@ exports.getTeamRequests = catchAsync(async (req, res, next) => {
   });
 
   res.status(200).json({
-    message: "Get team requests successfull",
+    message: "Get Team Requests Successfull",
     requests,
   });
 });
@@ -323,16 +401,11 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
     );
-  }
-
-  //checking team size
-  if (team.members.length === 4) {
-    return next(new AppError("Team is Full", 412, errorCodes.TEAM_IS_FULL));
   }
 
   //check whether userid (user whose status is to be updated) is valid
@@ -340,7 +413,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
   if (!requestedUser) {
     return next(
       new AppError(
-        "Invalid UserId of requested user",
+        "Invalid UserId of Requested User",
         412,
         errorCodes.INVALID_USERID
       )
@@ -351,7 +424,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
   if (requestedUser.teamId) {
     return next(
       new AppError(
-        "Requested User already part of a team",
+        "Requested User already part of a Team",
         412,
         errorCodes.USER_ALREADY_IN_TEAM
       )
@@ -368,7 +441,7 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
   if (!request) {
     return next(
       new AppError(
-        "No pending request found",
+        "No Pending Request Found",
         412,
         errorCodes.NO_PENDING_REQUESTS
       )
@@ -385,9 +458,22 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
       },
       { $set: { status: requestStatusTypes.REJECTED } }
     );
+
+    await User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+      },
+      {
+        $inc: { noOfPendingRequests: -1 },
+      }
+    );
   }
 
   if (req.body.status === approvalStatusTypes.APPROVED) {
+    //checking team size
+    if (team.members.length === 4) {
+      return next(new AppError("Team is Full", 412, errorCodes.TEAM_IS_FULL));
+    }
     //updating users teamid and role
     await User.findOneAndUpdate(
       {
@@ -424,19 +510,41 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
         $push: { members: req.body.userId },
       }
     );
+
+    await User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+      },
+      {
+        noOfPendingRequests: 0,
+      }
+    );
+
+    const user = await User.findById({ _id: req.body.userId });
+    transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: user.email,
+      subject: "FUTUREPRENEURS-ECELL-VIT. Request Approved By Team",
+      html:
+        user.firstName +
+        " " +
+        user.lastName +
+        " " +
+        "your request is approved by team " +
+        team.teamName +
+        ".<br>" +
+        "Click on the link to view the team details https://future-preneurs-22.vercel.app/.<br>",
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+        accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
+        expires: 3599,
+      },
+    });
   }
 
-  await User.findOneAndUpdate(
-    {
-      _id: req.user._id,
-    },
-    {
-      $inc: { noOfPendingRequests: -1 },
-    }
-  );
-
   res.status(201).json({
-    message: "Updated request successfully",
+    message: "Updated Request Successfully",
   });
 });
 
@@ -472,7 +580,7 @@ exports.removeMember = catchAsync(async (req, res, next) => {
   const userToRemove = await User.findById({ _id: req.body.userId });
   if (!userToRemove) {
     return next(
-      new AppError("Invalid userId to remove", 412, errorCodes.INVALID_USERID)
+      new AppError("Invalid UserId to Remove", 412, errorCodes.INVALID_USERID)
     );
   }
 
@@ -494,7 +602,7 @@ exports.removeMember = catchAsync(async (req, res, next) => {
   ) {
     return next(
       new AppError(
-        "User to remove and teamId didnt match",
+        "User to remove and TeamId didnt Match",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID
       )
@@ -518,15 +626,39 @@ exports.removeMember = catchAsync(async (req, res, next) => {
     {
       userId: req.body.userId,
       teamId: req.params.teamId,
-      status: requestStatusTypes.APPROVED,
+      $or: [
+        { status: requestStatusTypes.APPROVED },
+        { status: requestStatusTypes.JOINED_VIA_TOKEN },
+      ],
     },
     {
       $set: { status: requestStatusTypes.REMOVED_FROM_TEAM },
     }
   );
 
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: userToRemove.email,
+    subject: "FUTUREPRENEURS-ECELL-VIT. Removed From Team",
+    html:
+      userToRemove.firstName +
+      " " +
+      userToRemove.lastName +
+      " " +
+      "You have been removed from the team " +
+      team.teamName +
+      ".<br>" +
+      "To Join or Create a new Team Click on the link https://fp.ecellvit.com/",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
+      expires: 3599,
+    },
+  });
+
   res.status(201).json({
-    message: "User removed successfully",
+    message: "User Removed Successfully",
   });
 });
 
@@ -542,7 +674,7 @@ exports.getAllTeams = catchAsync(async (req, res, next) => {
   // console.log("Time Taken = ", endTime - startTime);
   // console.log(teams);
   res.status(201).json({
-    message: "Get all teams successfull",
+    message: "Get All Teams Successfull",
     paginatedResult: res.paginatedResults,
   });
 });
@@ -568,7 +700,7 @@ exports.getTeamToken = catchAsync(async (req, res, next) => {
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
@@ -578,7 +710,7 @@ exports.getTeamToken = catchAsync(async (req, res, next) => {
   const { teamToken } = await generateTeamToken(team);
 
   res.status(201).json({
-    message: "Team token generated succesfully",
+    message: "Team Token Generated Succesfully",
     teamToken,
   });
 });
@@ -603,7 +735,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
   if (team.teamLeaderId.toString() !== req.user._id) {
     return next(
       new AppError(
-        "User doesn't belong to the team or user isn't a leader",
+        "User doesn't belong to the Team or User isn't a Leader",
         412,
         errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
       )
