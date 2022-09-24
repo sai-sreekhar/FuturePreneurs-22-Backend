@@ -33,7 +33,14 @@ module.exports = {
       const endIndex = page * limit;
 
       const results = {};
-      if (endIndex < (await teamModel.countDocuments().exec())) {
+      if (
+        endIndex <
+        (await teamModel.countDocuments({
+          $expr: {
+            $lt: [{ $size: { $ifNull: ["$members", []] } }, 4],
+          },
+        }))
+      ) {
         results.next = {
           page: page + 1,
           limit: limit,
