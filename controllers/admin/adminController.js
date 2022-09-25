@@ -1,7 +1,6 @@
 const User = require("../../models/userModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-const QuestionsModel = require("../../models/questionsModel");
 const AnswersModel = require("../../models/answersModel");
 const QuizModel = require("../../models/quizModel");
 const TeamQuizModel = require("../../models/teamQuizModel");

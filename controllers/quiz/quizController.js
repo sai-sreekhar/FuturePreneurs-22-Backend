@@ -1,30 +1,5 @@
-const User = require("../../models/userModel");
-const Team = require("../../models/teamModel");
-const PendingApprovalsModel = require("../../models/pendingApprovalsModel");
-const TeamQuizModel = require("../../models/teamQuizModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-const {
-  errorCodes,
-  requestStatusTypes,
-  teamRole,
-  approvalStatusTypes,
-  objectIdLength,
-  noOfQuestionsToAnswer,
-  quizId,
-  // SESConfig,
-} = require("../../utils/constants");
-const {
-  createTeamBodyValidation,
-  updateTeamBodyValidation,
-  updateRequestBodyValidation,
-  removeMemberBodyValidation,
-  submitAnswerValidtionSchema,
-} = require("./validationSchema");
-const { generateTeamToken } = require("./utils");
-const QuestionsModel = require("../../models/questionsModel");
-const QuizModel = require("../../models/quizModel");
-const AnswersModel = require("../../models/answersModel");
 // const AWS = require("aws-sdk");
 
 exports.getQuestion = catchAsync(async (req, res, next) => {

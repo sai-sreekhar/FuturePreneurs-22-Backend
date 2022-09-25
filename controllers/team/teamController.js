@@ -22,7 +22,6 @@ const {
   submitAnswerValidtionSchema,
 } = require("./validationSchema");
 const { generateTeamToken } = require("./utils");
-const QuestionsModel = require("../../models/questionsModel");
 const QuizModel = require("../../models/quizModel");
 const AnswersModel = require("../../models/answersModel");
 const path = require("path");
