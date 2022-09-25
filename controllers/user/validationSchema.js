@@ -15,8 +15,8 @@ module.exports = {
 
   fillUserDetailsBodyValidation: (body) => {
     const Schema = Joi.object({
-      firstName: Joi.string().required(),
-      lastName: Joi.string().required(),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
       regNo: Joi.string().required(),
       mobileNumber: Joi.string()
         .length(10)

@@ -29,6 +29,7 @@ module.exports = {
     const schema = Joi.object({
       token: Joi.string().required(),
       email: Joi.string().email().required(),
+      name: Joi.string().required(),
     });
     return schema.validate(body);
   },

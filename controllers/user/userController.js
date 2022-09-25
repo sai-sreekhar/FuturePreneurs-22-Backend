@@ -115,21 +115,15 @@ exports.sendRequest = catchAsync(async (req, res, next) => {
     html:
       user.firstName +
       " " +
-      user.lastName +
-      " " +
       "has sent a request to join your team " +
       team.teamName +
       ".<br>" +
       "To Approve or reject the request click on the link https://fp.ecellvit.com/.<br>" +
       user.firstName +
-      " " +
-      user.lastName +
       "'s Mobile Number: " +
       user.mobileNumber +
       "<br>" +
       user.firstName +
-      " " +
-      user.lastName +
       "'s Email: " +
       user.email,
     auth: {
@@ -264,8 +258,6 @@ exports.fillUserDetails = catchAsync(async (req, res, next) => {
     { _id: req.user._id },
     {
       $set: {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
         regNo: req.body.regNo,
         mobileNumber: req.body.mobileNumber,
         hasFilledDetails: true,

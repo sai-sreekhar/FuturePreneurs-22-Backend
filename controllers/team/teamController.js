@@ -527,8 +527,6 @@ exports.updateRequest = catchAsync(async (req, res, next) => {
       html:
         user.firstName +
         " " +
-        user.lastName +
-        " " +
         "your request is approved by team " +
         team.teamName +
         ".<br>" +
@@ -641,8 +639,6 @@ exports.removeMember = catchAsync(async (req, res, next) => {
     subject: "FUTUREPRENEURS-ECELL-VIT. Removed From Team",
     html:
       userToRemove.firstName +
-      " " +
-      userToRemove.lastName +
       " " +
       "You have been removed from the team " +
       team.teamName +
