@@ -19,7 +19,6 @@ const teamSchema = mongoose.Schema(
         ref: "Users",
       },
     ],
-    completedQuestions: [Number],
   },
   { collection: "Teams" }
 );

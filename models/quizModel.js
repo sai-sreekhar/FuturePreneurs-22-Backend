@@ -2,11 +2,9 @@ const mongoose = require("mongoose");
 
 const quizModelSchema = mongoose.Schema(
   {
-    presentQuestionId: {
+    noOfTeams: {
       type: Number,
-      default: 0,
     },
-    questionIds: [Number],
     cutoffScore: {
       type: Number,
     },
