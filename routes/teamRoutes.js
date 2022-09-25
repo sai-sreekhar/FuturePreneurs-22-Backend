@@ -15,9 +15,4 @@ teamRouter.route("/requests/:teamId").patch(auth, teamController.updateRequest);
 teamRouter.route("/remove/:teamId").patch(auth, teamController.removeMember);
 teamRouter.route("/token/:teamId").get(auth, teamController.getTeamToken);
 
-teamRouter.route("/quiz/:teamId").get(auth, teamController.getQuestion);
-teamRouter.route("/quiz/:teamId").post(auth, teamController.submitAnswer);
-// teamRouter.route("/quiz/answers/:teamId").post(auth, teamController.getAnswers);
-// teamRouter.route("/quiz/score/:teamId").post(auth, teamController.getScore);
-
 module.exports = teamRouter;

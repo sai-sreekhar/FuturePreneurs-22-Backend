@@ -12,6 +12,19 @@ const teamQuizSchema = mongoose.Schema(
     endTime: {
       type: Date,
     },
+    tabChangeStartTime: {
+      type: Date,
+    },
+    noOfMinutesSpent: {
+      type: Date,
+    },
+    setId: {
+      type: Number,
+    },
+    questionsOrder: [Number],
+    presentQuestionIdx: {
+      type: Number,
+    },
     score: {
       type: Number,
     },
