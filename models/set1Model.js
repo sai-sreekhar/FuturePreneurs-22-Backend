@@ -13,9 +13,6 @@ const set1ModelSchema = mongoose.Schema(
     },
     answers: [String],
     correctIdxs: [Number],
-    descriptiveAnswer: {
-      type: String,
-    },
   },
   { collection: "Set1Model" }
 );
