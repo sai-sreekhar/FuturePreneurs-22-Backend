@@ -2,10 +2,12 @@ const Joi = require("joi");
 const { objectIdLength } = require("../../utils/constants");
 
 module.exports = {
-  submitAnswerValidtionSchema: (body) => {
+  submitAnswerValidationSchema: (body) => {
     const Schema = Joi.object({
-      questionId: Joi.string().required().length(objectIdLength),
-      submittedIdx: Joi.number(),
+      setNum: Joi.number().required(),
+      questionNum: Joi.number().required(),
+      answerIdxs: Joi.array().items(Joi.number()).min(0).max(4),
+      descriptiveAnswer: Joi.string(),
     });
     return Schema.validate(body);
   },

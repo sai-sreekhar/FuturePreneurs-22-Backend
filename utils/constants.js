@@ -60,6 +60,15 @@ const errorCodes = {
   UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
 };
 
+const questionTypes = {
+  SINGLE_CORRECT: 0,
+  MULTI_CORRECT: 1,
+  MATCH_THE_FOLLOWING: 2,
+  CASE_STUDY_SINGLE: 3,
+  CASE_STUDY_MULTI: 4,
+  DESCRIPTIVE: 5,
+};
+
 // const SESConfig = {
 //   apiVersion: "2010-12-01",
 //   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
@@ -68,8 +77,8 @@ const errorCodes = {
 // };
 
 const objectIdLength = 24;
-const noOfQuestionsToAnswer = 15;
-const quizId = "631dd7972e4ee9fda84c1538";
+const noOfQuestionsToAnswer = 26;
+const quizId = "6330b8e5c8e1d15e867575c1";
 
 module.exports = {
   loginType,
@@ -80,5 +89,6 @@ module.exports = {
   objectIdLength,
   noOfQuestionsToAnswer,
   quizId,
+  questionTypes,
   // SESConfig,
 };
