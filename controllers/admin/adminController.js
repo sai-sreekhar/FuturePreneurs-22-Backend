@@ -1,8 +1,7 @@
 const User = require("../../models/userModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-const AnswersModel = require("../../models/answersModel");
-const QuizModel = require("../../models/quizModel");
+const QuestionsModel = require("../../models/questionsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
 const {
   errorCodes,
@@ -107,56 +106,42 @@ exports.sendEmails = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.setQuestion = catchAsync(async (req, res, next) => {
-//   const { error } = setQuestionBodyValidation(req.body);
-//   if (error) {
-//     return next(
-//       new AppError(
-//         error.details[0].message,
-//         400,
-//         errorCodes.INPUT_PARAMS_INVALID
-//       )
-//     );
-//   }
+exports.setQuestion = catchAsync(async (req, res, next) => {
+  const { error } = setQuestionBodyValidation(req.body);
+  if (error) {
+    return next(
+      new AppError(
+        error.details[0].message,
+        400,
+        errorCodes.INPUT_PARAMS_INVALID
+      )
+    );
+  }
 
-//   //checking admin
-//   const admin = await User.findById({ _id: req.user._id });
-//   if (admin.teamRole !== teamRole.ADMIN) {
-//     return next(
-//       new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
-//     );
-//   }
+  //checking admin
+  const admin = await User.findById({ _id: req.user._id });
+  if (admin.teamRole !== teamRole.ADMIN) {
+    return next(
+      new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
+    );
+  }
 
-//   //finding quizModel
-//   const quizModel = await QuizModel.findById({ _id: quizId });
+  //setting newQuestion
+  const newQuestion = await new QuestionsModel({
+    setNum: req.body.setNum,
+    questionNum: req.body.questionNum,
+    questionType: req.body.questionType,
+    caseStudy: req.body.caseStudy,
+    question: req.body.question,
+    options: req.body.options,
+    correctIdxs: req.body.correctIdxs,
+  }).save();
 
-//   //increasing presentQuestingId
-//   const newQuestionId = quizModel.presentQuestionId + 1;
-
-//   //updating quizModel
-//   await QuizModel.findOneAndUpdate(
-//     {
-//       _id: quizId,
-//     },
-//     {
-//       $push: { questionIds: newQuestionId },
-//       presentQuestionId: newQuestionId,
-//     }
-//   );
-
-//   //setting newQuestion
-//   const newQuestion = await new QuestionsModel({
-//     questionId: newQuestionId,
-//     question: req.body.question,
-//     answers: req.body.answers,
-//     correctIndex: req.body.correctIndex,
-//   }).save();
-
-//   res.status(201).json({
-//     message: "Question Saved Succesfully",
-//     questionId: newQuestion._id,
-//   });
-// });
+  res.status(201).json({
+    message: "Question Saved Succesfully",
+    questionId: newQuestion._id,
+  });
+});
 
 // exports.getQuestions = catchAsync(async (req, res, next) => {
 //   //checking admin

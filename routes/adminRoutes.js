@@ -12,7 +12,7 @@ const adminRouter = express.Router();
 // adminRouter
 //   .route("/question/:questionId")
 //   .get(auth, adminController.getQuestion);
-// adminRouter.route("/question").post(auth, adminController.setQuestion);
+adminRouter.route("/question").post(auth, adminController.setQuestion);
 // adminRouter
 //   .route("/question/:questionId")
 //   .patch(auth, adminController.modifyQuestion);

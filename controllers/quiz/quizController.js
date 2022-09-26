@@ -1,6 +1,19 @@
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-// const AWS = require("aws-sdk");
+const TeamQuizModel = require("../../models/teamQuizModel");
+const AnswersModel = require("../../models/answersModel");
+const Team = require("../../models/teamModel");
+const {
+  errorCodes,
+  objectIdLength,
+  noOfQuestionsToAnswer,
+  quizId,
+  questionTypes,
+} = require("../../utils/constants");
+const QuestionsModel = require("../../models/questionsModel");
+const { submitAnswerValidationSchema } = require("./validationSchema");
+
+let noOfTeams = 0;
 
 exports.getQuestion = catchAsync(async (req, res, next) => {
   if (req.params.teamId.length !== objectIdLength) {
@@ -30,10 +43,24 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
 
   let teamQuiz = await TeamQuizModel.findOne({ teamId: req.params.teamId });
   if (!teamQuiz) {
+    noOfTeams++;
+
+    let arr = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    ];
+    let len = arr.length;
+    while (--len > 0) {
+      let randIndex = Math.floor(Math.random() * (len + 1));
+      [arr[randIndex], arr[len]] = [arr[len], arr[randIndex]];
+    }
+
     teamQuiz = await new TeamQuizModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
       endTime: Date.now() + 900001,
+      setNum: 0, //noOfTeams % 10
+      questionsOrder: arr,
+      presentQuestionIdx: 0,
       score: 0,
     }).save();
   }
@@ -44,7 +71,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (team.completedQuestions.length === noOfQuestionsToAnswer) {
+  if (teamQuiz.presentQuestionIdx === noOfQuestionsToAnswer) {
     return next(
       new AppError(
         "Maximum Questions capacity reached",
@@ -53,44 +80,44 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
       )
     );
   }
-  const quizModel = await QuizModel.findById({ _id: quizId });
 
-  const totalQuestions = quizModel.questionIds.length;
-  let questionIdx = Math.floor(Math.random() * totalQuestions);
-  let curQuestionId = quizModel.questionIds[questionIdx];
-
-  let idxCount = 0;
-  while (
-    team.completedQuestions.includes(curQuestionId) &&
-    idxCount <= totalQuestions
-  ) {
-    // questionIdx = Math.floor(Math.random() * totalQuestions);
-    idxCount++;
-    questionIdx = (questionIdx + 1) % totalQuestions;
-  }
-
-  curQuestionId = quizModel.questionIds[questionIdx];
-  const question = await QuestionsModel.findOne(
-    { questionId: curQuestionId },
-    { question: 1, answers: 1 }
-  );
-
-  await Team.findOneAndUpdate(
-    { _id: req.params.teamId },
+  await TeamQuizModel.findOneAndUpdate(
     {
-      $push: { completedQuestions: curQuestionId },
+      teamId: req.params.teamId,
+    },
+    {
+      $inc: { presentQuestionIdx: 1 },
     }
   );
 
+  let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
+  let question;
+  if (newPresentQuestionIdx > 20) {
+    question = await QuestionsModel.findOne({
+      setNum: teamQuiz.setNum,
+      questionNum: newPresentQuestionIdx,
+    });
+  } else {
+    question = await QuestionsModel.findOne({
+      setNum: teamQuiz.setNum,
+      questionNum: teamQuiz.questionsOrder[newPresentQuestionIdx - 1],
+    });
+  }
+
   res.status(201).json({
-    message: "get question successfull",
-    question,
+    message: "Get Question Successfull",
+    setNum: question.setNum,
+    questionNum: question.questionNum,
+    questionType: question.questionType,
+    caseStudy: question.caseStudy,
+    question: question.question,
+    options: question.options,
     endTime: teamQuiz.endTime,
   });
 });
 
 exports.submitAnswer = catchAsync(async (req, res, next) => {
-  const { error } = submitAnswerValidtionSchema(req.body);
+  const { error } = submitAnswerValidationSchema(req.body);
   if (error) {
     return next(
       new AppError(
@@ -127,6 +154,7 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
   }
 
   let teamQuiz = await TeamQuizModel.findOne({ teamId: req.params.teamId });
+
   if (!teamQuiz) {
     return next(new AppError("No Data Found", 412, errorCodes.NO_DATA_FOUND));
   }
@@ -137,31 +165,71 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
     );
   }
 
-  const question = await QuestionsModel.findOne({ _id: req.body.questionId });
+  const question = await QuestionsModel.findOne({
+    questionNum: req.body.questionNum,
+    setNum: req.body.setNum,
+  });
+
   if (!question) {
     return next(
       new AppError("Invalid QuestionId", 412, errorCodes.INVALID_QUESTION_ID)
     );
   }
 
-  await new AnswersModel({
-    teamId: req.params.teamId,
-    questionId: req.body.questionId,
-    answerIdx: req.body.submittedIdx,
-  }).save();
+  if (req.body.questionType === questionTypes.DESCRIPTIVE) {
+    await new AnswersModel({
+      teamId: req.params.teamId,
+      questionId: question._id,
+      setNum: teamQuiz.setNum,
+      questionNum: req.body.questionNum,
+      descriptiveAnswer: req.body.descriptiveAnswer,
+    }).save();
+  } else {
+    await new AnswersModel({
+      teamId: req.params.teamId,
+      questionId: question._id,
+      setNum: teamQuiz.setNum,
+      questionNum: req.body.questionNum,
+      answerIdxs: req.body.answerIdxs,
+    }).save();
 
-  if (req.body.submittedIdx === question.correctIndex) {
-    await TeamQuizModel.findOneAndUpdate(
-      {
-        teamId: req.params.teamId,
-      },
-      {
-        $inc: { score: 1 },
-      }
-    );
+    if (req.body.answerIdxs.length === 0) {
+      await TeamQuizModel.findOneAndUpdate(
+        {
+          teamId: req.params.teamId,
+        },
+        {
+          $inc: { score: 0 },
+        }
+      );
+    } else if (
+      JSON.stringify(req.body.answerIdxs) !==
+      JSON.stringify(question.correctIdxs)
+    ) {
+      await TeamQuizModel.findOneAndUpdate(
+        {
+          teamId: req.params.teamId,
+        },
+        {
+          $inc: { score: -1 },
+        }
+      );
+    } else if (
+      JSON.stringify(req.body.answerIdxs) ===
+      JSON.stringify(question.correctIdxs)
+    ) {
+      await TeamQuizModel.findOneAndUpdate(
+        {
+          teamId: req.params.teamId,
+        },
+        {
+          $inc: { score: 4 },
+        }
+      );
+    }
   }
 
   res.status(201).json({
-    message: "submitted answer successfull",
+    message: "Submitted Answer Successfully",
   });
 });

@@ -6,12 +6,14 @@ const answersSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teams",
     },
+    questionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "QuestionsModel",
+    },
     setNum: {
       type: Number,
     },
     questionNum: {
-      // type: mongoose.Schema.Types.ObjectId,//think of populating
-      // refPath: "",
       type: Number,
     },
     answerIdxs: [Number],
