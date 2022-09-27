@@ -152,8 +152,7 @@ exports.resetQuiz = catchAsync(async (req, res, next) => {
     teamId: req.params.teamId,
   });
   res.status(201).json({
-    message: "A Saved Succesfully",
-    questionId: newQuestion._id,
+    message: "Reset Quiz Succesfull",
   });
 });
 
