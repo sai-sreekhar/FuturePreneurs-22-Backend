@@ -3,6 +3,7 @@ const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
 const QuestionsModel = require("../../models/questionsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
+const AnswersModel = require("../../models/answersModel");
 const {
   errorCodes,
   teamRole,
@@ -138,6 +139,20 @@ exports.setQuestion = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     message: "Question Saved Succesfully",
+    questionId: newQuestion._id,
+  });
+});
+
+exports.resetQuiz = catchAsync(async (req, res, next) => {
+  await AnswersModel.deleteMany({
+    teamId: req.params.teamId,
+  });
+
+  await TeamQuizModel.findOneAndDelete({
+    teamId: req.params.teamId,
+  });
+  res.status(201).json({
+    message: "A Saved Succesfully",
     questionId: newQuestion._id,
   });
 });
