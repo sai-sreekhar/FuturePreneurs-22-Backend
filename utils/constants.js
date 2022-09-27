@@ -78,7 +78,6 @@ const questionTypes = {
 
 const objectIdLength = 24;
 const noOfQuestionsToAnswer = 26;
-const quizId = "6330b8e5c8e1d15e867575c1";
 
 module.exports = {
   loginType,
@@ -88,7 +87,6 @@ module.exports = {
   errorCodes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  quizId,
   questionTypes,
   // SESConfig,
 };

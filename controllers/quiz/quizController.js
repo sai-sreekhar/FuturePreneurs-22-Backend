@@ -7,7 +7,6 @@ const {
   errorCodes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  quizId,
   questionTypes,
 } = require("../../utils/constants");
 const QuestionsModel = require("../../models/questionsModel");
@@ -176,7 +175,7 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (req.body.questionType === questionTypes.DESCRIPTIVE) {
+  if (question.questionType === questionTypes.DESCRIPTIVE) {
     await new AnswersModel({
       teamId: req.params.teamId,
       questionId: question._id,

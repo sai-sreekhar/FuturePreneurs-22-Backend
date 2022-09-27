@@ -7,7 +7,6 @@ const {
   errorCodes,
   teamRole,
   objectIdLength,
-  quizId,
 } = require("../../utils/constants");
 const {
   setQuestionBodyValidation,
