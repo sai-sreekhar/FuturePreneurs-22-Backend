@@ -29,6 +29,11 @@ const approvalStatusTypes = {
   APPROVED: 1,
 };
 
+const quizStatusTypes = {
+  NOT_STARTED: 0,
+  STARTED: 1,
+};
+
 const errorCodes = {
   UNKNOWN_ERROR: 0,
   EXCEPTION: 1,
@@ -54,7 +59,7 @@ const errorCodes = {
   TIME_LIMIT_REACHED: 21,
   NOT_ADMIN: 22,
   INVALID_QUESTION_ID: 23,
-  NO_DATA_FOUND: 24,
+  NOT_STARTED_QUIZ: 24,
   PENDING_REQUESTS_LIMIT_REACHED: 25,
   SAME_EXISTING_TEAMNAME: 26,
   UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
@@ -88,5 +93,6 @@ module.exports = {
   objectIdLength,
   noOfQuestionsToAnswer,
   questionTypes,
+  quizStatusTypes
   // SESConfig,
 };

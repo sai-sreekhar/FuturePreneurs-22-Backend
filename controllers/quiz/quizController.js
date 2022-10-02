@@ -8,9 +8,12 @@ const {
   objectIdLength,
   noOfQuestionsToAnswer,
   questionTypes,
+  teamRole,
+  quizStatusTypes,
 } = require("../../utils/constants");
 const QuestionsModel = require("../../models/questionsModel");
 const { submitAnswerValidationSchema } = require("./validationSchema");
+const userModel = require("../../models/userModel");
 
 let noOfTeams = 0;
 
@@ -231,4 +234,33 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Submitted Answer Successfully",
   });
+});
+
+exports.hasStartedQuiz = catchAsync(async (req, res, next) => {
+  const user = await userModel.findOne({ _id: req.user._id });
+
+  //check whether user belongs to the given team and role
+  if (user.teamRole == null || user.teamRole !== teamRole.LEADER) {
+    return next(
+      new AppError(
+        "User isn't a leader or user doesn't have team",
+        412,
+        errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
+      )
+    );
+  }
+
+  let teamQuiz = await TeamQuizModel.findOne({ teamId: user.teamId });
+
+  if (!teamQuiz) {
+    res.status(201).json({
+      message: "Sent Response Successfully",
+      status: quizStatusTypes.NOT_STARTED,
+    });
+  } else {
+    res.status(201).json({
+      message: "Sent Response Successfully",
+      status: quizStatusTypes.STARTED,
+    });
+  }
 });
