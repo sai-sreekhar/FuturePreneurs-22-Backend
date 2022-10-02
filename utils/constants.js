@@ -83,7 +83,7 @@ const questionTypes = {
 // };
 
 const objectIdLength = 24;
-const noOfQuestionsToAnswer = 26;
+const noOfQuestionsToAnswer = 40;
 const noOfSets = 3;
 
 module.exports = {
