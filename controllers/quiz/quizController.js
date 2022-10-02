@@ -58,7 +58,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     teamQuiz = await new TeamQuizModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
-      endTime: Date.now() + 900001,
+      endTime: Date.now() + 2400000,
       setNum: 0,//noOfTeams % noOfSets,
       questionsOrder: arr,
       presentQuestionIdx: 0,

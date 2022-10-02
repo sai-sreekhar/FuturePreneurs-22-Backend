@@ -72,6 +72,7 @@ const questionTypes = {
   CASE_STUDY_SINGLE: 3,
   CASE_STUDY_MULTI: 4,
   DESCRIPTIVE: 5,
+  IMAGE_QUESTION: 6,
 };
 
 // const SESConfig = {
