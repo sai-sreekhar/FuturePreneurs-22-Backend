@@ -74,7 +74,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (teamQuiz.presentQuestionIdx === noOfQuestionsToAnswer) {
+  if (teamQuiz.presentQuestionIdx >= noOfQuestionsToAnswer) {
     return next(
       new AppError(
         "Maximum Questions capacity reached",
@@ -84,26 +84,26 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  await TeamQuizModel.findOneAndUpdate(
-    {
-      teamId: req.params.teamId,
-    },
-    {
-      $inc: { presentQuestionIdx: 1 },
-    }
-  );
+  // await TeamQuizModel.findOneAndUpdate(
+  //   {
+  //     teamId: req.params.teamId,
+  //   },
+  //   {
+  //     $inc: { presentQuestionIdx: 1 },
+  //   }
+  // );
 
-  let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
+  // let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
   let question;
-  if (newPresentQuestionIdx > 25) {
+  if (teamQuiz.presentQuestionIdx >= 25) {
     question = await QuestionsModel.findOne({
       setNum: teamQuiz.setNum,
-      questionNum: newPresentQuestionIdx,
+      questionNum: teamQuiz.presentQuestionIdx + 1,
     });
   } else {
     question = await QuestionsModel.findOne({
       setNum: teamQuiz.setNum,
-      questionNum: teamQuiz.questionsOrder[newPresentQuestionIdx - 1],
+      questionNum: teamQuiz.questionsOrder[teamQuiz.presentQuestionIdx],
     });
   }
 
@@ -117,7 +117,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     question: question.question,
     options: question.options,
     endTime: teamQuiz.endTime,
-    presentQuestionNum: newPresentQuestionIdx,
+    presentQuestionNum: teamQuiz.presentQuestionIdx + 1,
   });
 });
 
@@ -180,6 +180,15 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
       new AppError("Invalid QuestionId", 412, errorCodes.INVALID_QUESTION_ID)
     );
   }
+
+  await TeamQuizModel.findOneAndUpdate(
+    {
+      teamId: req.params.teamId,
+    },
+    {
+      $inc: { presentQuestionIdx: 1 },
+    }
+  );
 
   if (question.questionType === questionTypes.DESCRIPTIVE) {
     await new AnswersModel({
