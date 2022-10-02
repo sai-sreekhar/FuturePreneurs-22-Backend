@@ -47,7 +47,8 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
   let teamQuiz = await TeamQuizModel.findOne({ teamId: req.params.teamId });
   if (!teamQuiz) {
     let arr = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      22, 23, 24, 25,
     ];
     let len = arr.length;
     while (--len > 0) {
@@ -59,7 +60,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
       teamId: req.params.teamId,
       startTime: Date.now(),
       endTime: Date.now() + 2400000,
-      setNum: 1,//noOfTeams % noOfSets,
+      setNum: 1, //noOfTeams % noOfSets,
       questionsOrder: arr,
       presentQuestionIdx: 0,
       score: 0,
@@ -94,7 +95,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
 
   let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
   let question;
-  if (newPresentQuestionIdx > 20) {
+  if (newPresentQuestionIdx > 25) {
     question = await QuestionsModel.findOne({
       setNum: teamQuiz.setNum,
       questionNum: newPresentQuestionIdx,
@@ -112,6 +113,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     questionNum: question.questionNum,
     questionType: question.questionType,
     caseStudy: question.caseStudy,
+    imageSrc: question.imageSrc,
     question: question.question,
     options: question.options,
     endTime: teamQuiz.endTime,
