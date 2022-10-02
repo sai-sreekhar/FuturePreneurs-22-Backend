@@ -59,7 +59,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
       teamId: req.params.teamId,
       startTime: Date.now(),
       endTime: Date.now() + 2400000,
-      setNum: 0,//noOfTeams % noOfSets,
+      setNum: 1,//noOfTeams % noOfSets,
       questionsOrder: arr,
       presentQuestionIdx: 0,
       score: 0,
