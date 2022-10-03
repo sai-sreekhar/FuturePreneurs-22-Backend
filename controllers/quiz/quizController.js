@@ -7,11 +7,14 @@ const {
   errorCodes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  quizId,
   questionTypes,
+  teamRole,
+  quizStatusTypes,
+  noOfSets,
 } = require("../../utils/constants");
 const QuestionsModel = require("../../models/questionsModel");
 const { submitAnswerValidationSchema } = require("./validationSchema");
+const userModel = require("../../models/userModel");
 
 let noOfTeams = 0;
 
@@ -43,10 +46,9 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
 
   let teamQuiz = await TeamQuizModel.findOne({ teamId: req.params.teamId });
   if (!teamQuiz) {
-    noOfTeams++;
-
     let arr = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      22, 23, 24, 25,
     ];
     let len = arr.length;
     while (--len > 0) {
@@ -57,12 +59,13 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     teamQuiz = await new TeamQuizModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
-      endTime: Date.now() + 900001,
-      setNum: 0, //noOfTeams % 10
+      endTime: Date.now() + 2400000,
+      setNum: 1, //noOfTeams % noOfSets,
       questionsOrder: arr,
       presentQuestionIdx: 0,
       score: 0,
     }).save();
+    noOfTeams++;
   }
 
   if (teamQuiz.endTime < Date.now()) {
@@ -71,7 +74,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (teamQuiz.presentQuestionIdx === noOfQuestionsToAnswer) {
+  if (teamQuiz.presentQuestionIdx >= noOfQuestionsToAnswer) {
     return next(
       new AppError(
         "Maximum Questions capacity reached",
@@ -81,26 +84,26 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  await TeamQuizModel.findOneAndUpdate(
-    {
-      teamId: req.params.teamId,
-    },
-    {
-      $inc: { presentQuestionIdx: 1 },
-    }
-  );
+  // await TeamQuizModel.findOneAndUpdate(
+  //   {
+  //     teamId: req.params.teamId,
+  //   },
+  //   {
+  //     $inc: { presentQuestionIdx: 1 },
+  //   }
+  // );
 
-  let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
+  // let newPresentQuestionIdx = teamQuiz.presentQuestionIdx + 1;
   let question;
-  if (newPresentQuestionIdx > 20) {
+  if (teamQuiz.presentQuestionIdx >= 25) {
     question = await QuestionsModel.findOne({
       setNum: teamQuiz.setNum,
-      questionNum: newPresentQuestionIdx,
+      questionNum: teamQuiz.presentQuestionIdx + 1,
     });
   } else {
     question = await QuestionsModel.findOne({
       setNum: teamQuiz.setNum,
-      questionNum: teamQuiz.questionsOrder[newPresentQuestionIdx - 1],
+      questionNum: teamQuiz.questionsOrder[teamQuiz.presentQuestionIdx],
     });
   }
 
@@ -110,9 +113,11 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
     questionNum: question.questionNum,
     questionType: question.questionType,
     caseStudy: question.caseStudy,
+    imageSrc: question.imageSrc,
     question: question.question,
     options: question.options,
     endTime: teamQuiz.endTime,
+    presentQuestionNum: teamQuiz.presentQuestionIdx + 1,
   });
 });
 
@@ -176,7 +181,16 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (req.body.questionType === questionTypes.DESCRIPTIVE) {
+  await TeamQuizModel.findOneAndUpdate(
+    {
+      teamId: req.params.teamId,
+    },
+    {
+      $inc: { presentQuestionIdx: 1 },
+    }
+  );
+
+  if (question.questionType === questionTypes.DESCRIPTIVE) {
     await new AnswersModel({
       teamId: req.params.teamId,
       questionId: question._id,
@@ -232,4 +246,33 @@ exports.submitAnswer = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Submitted Answer Successfully",
   });
+});
+
+exports.hasStartedQuiz = catchAsync(async (req, res, next) => {
+  const user = await userModel.findOne({ _id: req.user._id });
+
+  //check whether user belongs to the given team and role
+  if (user.teamRole == null || user.teamRole !== teamRole.LEADER) {
+    return next(
+      new AppError(
+        "User isn't a leader or user doesn't have team",
+        412,
+        errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
+      )
+    );
+  }
+
+  let teamQuiz = await TeamQuizModel.findOne({ teamId: user.teamId });
+
+  if (!teamQuiz) {
+    res.status(201).json({
+      message: "Sent Response Successfully",
+      status: quizStatusTypes.NOT_STARTED,
+    });
+  } else {
+    res.status(201).json({
+      message: "Sent Response Successfully",
+      status: quizStatusTypes.STARTED,
+    });
+  }
 });

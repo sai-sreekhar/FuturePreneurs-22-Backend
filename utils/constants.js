@@ -29,6 +29,11 @@ const approvalStatusTypes = {
   APPROVED: 1,
 };
 
+const quizStatusTypes = {
+  NOT_STARTED: 0,
+  STARTED: 1,
+};
+
 const errorCodes = {
   UNKNOWN_ERROR: 0,
   EXCEPTION: 1,
@@ -54,7 +59,7 @@ const errorCodes = {
   TIME_LIMIT_REACHED: 21,
   NOT_ADMIN: 22,
   INVALID_QUESTION_ID: 23,
-  NO_DATA_FOUND: 24,
+  NOT_STARTED_QUIZ: 24,
   PENDING_REQUESTS_LIMIT_REACHED: 25,
   SAME_EXISTING_TEAMNAME: 26,
   UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
@@ -67,6 +72,7 @@ const questionTypes = {
   CASE_STUDY_SINGLE: 3,
   CASE_STUDY_MULTI: 4,
   DESCRIPTIVE: 5,
+  IMAGE_QUESTION: 6,
 };
 
 // const SESConfig = {
@@ -77,8 +83,8 @@ const questionTypes = {
 // };
 
 const objectIdLength = 24;
-const noOfQuestionsToAnswer = 26;
-const quizId = "6330b8e5c8e1d15e867575c1";
+const noOfQuestionsToAnswer = 41;
+const noOfSets = 3;
 
 module.exports = {
   loginType,
@@ -88,7 +94,8 @@ module.exports = {
   errorCodes,
   objectIdLength,
   noOfQuestionsToAnswer,
-  quizId,
   questionTypes,
+  quizStatusTypes,
+  noOfSets,
   // SESConfig,
 };

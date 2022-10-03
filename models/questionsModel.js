@@ -11,6 +11,9 @@ const questionsModelSchema = mongoose.Schema(
     questionType: {
       type: Number,
     },
+    imageSrc: {
+      type: String,
+    },
     caseStudy: {
       type: String,
     },

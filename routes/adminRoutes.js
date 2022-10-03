@@ -19,7 +19,7 @@ adminRouter.route("/question").post(auth, adminController.setQuestion);
 // adminRouter
 //   .route("/question/:questionId")
 //   .delete(auth, adminController.deleteQuestion);
-
+adminRouter.route("/reset/:teamId").get(adminController.resetQuiz);
 adminRouter.route("/user").get(adminController.getUsersCount);
 adminRouter.route("/team").get(adminController.getTeamsCount);
 adminRouter.route("/email").get(adminController.sendEmails);

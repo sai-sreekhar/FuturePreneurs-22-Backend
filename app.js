@@ -11,18 +11,18 @@ const app = express();
 
 app.use(express.json());
 
-app.use(
-  limiter({
-    windowMs: 1 * 60 * 1000, //100 per min requests allowed from one IP address
-    max: 100,
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    message: {
-      code: 429,
-      message: "Too many requests made, please try again later",
-    },
-  })
-);
+// app.use(
+//   limiter({
+//     windowMs: 1 * 60 * 1000, //100 per min requests allowed from one IP address
+//     max: 100,
+//     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+//     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+//     message: {
+//       code: 429,
+//       message: "Too many requests made, please try again later",
+//     },
+//   })
+// );
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect

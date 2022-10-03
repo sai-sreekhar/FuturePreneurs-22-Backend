@@ -3,11 +3,11 @@ const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
 const QuestionsModel = require("../../models/questionsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
+const AnswersModel = require("../../models/answersModel");
 const {
   errorCodes,
   teamRole,
   objectIdLength,
-  quizId,
 } = require("../../utils/constants");
 const {
   setQuestionBodyValidation,
@@ -63,10 +63,10 @@ exports.sendEmails = catchAsync(async (req, res, next) => {
   );
 
   // let userEmails = ["godalasai.sreekar2021@vitstudent.ac.in"];
-  let userEmails = [];
-  for (let i = 0; i < users.length; i++) {
-    userEmails.push(users[i].email);
-  }
+  let userEmails = ["godalasai.sreekar2021@vitstudent.ac.in"];
+  // for (let i = 0; i < users.length; i++) {
+  //   userEmails.push(users[i].email);
+  // }
 
   // for (let i = 0; i < userEmails.length; i++) {
   //   transporter.sendMail({
@@ -83,21 +83,25 @@ exports.sendEmails = catchAsync(async (req, res, next) => {
   //   });
   // }
 
-  // for (let i = 0; i < userEmails.length; i++) {
-  //   transporter.sendMail({
-  //     from: process.env.NODEMAILER_EMAIL,
-  //     to: userEmails[i],
-  //     subject: "FUTUREPRENEURS-ECELL-VIT.",
-  //     html: "Greetings from E-Cell, VIT!<br>We are thrilled to see your enthusiasm in registering for FuturePreneurs 8.0!<br>Unfortunately, it seems that you have missed out on entering your contact details.<br>This is a reminder to head to our portal, fp.ecellvit.com to complete your registration with the necessary details before the 30th of September to be an eligible participant.<br>For further queries please reach out to us via email - ecell@vit.ac.in<br>Regards,<br>Team E-Cell, VIT.<br>",
-  //     auth: {
-  //       user: process.env.NODEMAILER_EMAIL,
-  //       refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
-  //       accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
-  //       expires: 3599,
-  //     },
-  //   });
-  // }
-
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: userEmails,
+    subject: "FUTUREPRENEURS-ECELL-VIT.",
+    html: 'Greetings from Entrepreneurship Cell VIT,<br><br>Hello and welcome to FuturePreneurs! We hope all of you are all pumped up for our flagship event.<br><br>This email is to remind you that in order to qualify for Round 0 of Futurepreneurs 8.0 on October 4th, each team must have four members. The deadline for joining an existing team or completing your own team is September 30th, 2022.<br><br>To join a team, you can either connect with other team leaders through the WhatsApp groups you’ve been added to or you can visit Futurepreneurs’ dashboard.<br>Link to Dashboard: https://fp.ecellvit.com/dashboard<br><br>After signing in, you’ll have an option that would enable you to send a request to a team in order to join them.<br><br>All the directions to do the needful are mentioned in the PDF attached below.<br>Please find the Instruction Manual in the PDF attached below.<br><br>For further queries please feel free to reach out to us via our social media handles or E-Mail us at ecell@vit.ac.in<br><br>Regards,<br>Team E-Cell, VIT<br><embed type="image/svg+xml" src="C:/Users/sridh/Downloads/ecellLogo" /><br><br>Social Media Handles:<br>Instagram: https://www.instagram.com/ecell_vit<br>Twitter: https://twitter.com/ecell_vit<br>Linkedin: https://www.linkedin.com/company/ecellvitvellore<br><br>',
+    attachments: [
+      {
+        filename: "Instructions Manual.pdf",
+        path: "C:/Users/sridh/Downloads/instructionsManual.pdf",
+        contentType: "application/pdf",
+      },
+    ],
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      refreshToken: process.env.NODEMAILER_REFRESH_TOKEN,
+      accessToken: process.env.NODEMAILER_ACCESS_TOKEN,
+      expires: 3599,
+    },
+  });
   console.log(userEmails);
   res.status(201).json({
     message: "Emails Sent Successfully",
@@ -140,6 +144,19 @@ exports.setQuestion = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Question Saved Succesfully",
     questionId: newQuestion._id,
+  });
+});
+
+exports.resetQuiz = catchAsync(async (req, res, next) => {
+  await AnswersModel.deleteMany({
+    teamId: req.params.teamId,
+  });
+
+  await TeamQuizModel.findOneAndDelete({
+    teamId: req.params.teamId,
+  });
+  res.status(201).json({
+    message: "Reset Quiz Succesfull",
   });
 });
 
