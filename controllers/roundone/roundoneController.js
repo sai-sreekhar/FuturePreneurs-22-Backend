@@ -161,9 +161,9 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
     if (roundOne) {
         return next(
             new AppError(
-                "Response was already recieved and saved",
+                "Response was already recieved and saved for this round.",
                 412,
-                errorCodes.ROUNDONE_RESPONSE_ALREADY_SUBMITTED,
+                errorCodes.ROUND_RESPONSE_ALREADY_SUBMITTED,
 
             )
         );
@@ -200,7 +200,14 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
 
     }
     if ((mapChoice === "Temple") || (mapChoice === "Beach") || (mapChoice === "Tech-Park")) {
-
+        await RoundOneModel.findOneAndUpdate(
+            {
+                teamId: req.params.teamId,
+            },
+            {
+                $set: { "finalmapChoice": mapChoice },
+            }
+        );
 
         res.status(201).json(
             {
@@ -209,6 +216,15 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
             })
     }
     if ((mapChoice === "Hospital") || (mapChoice === "School")) {
+        await RoundOneModel.findOneAndUpdate(
+            {
+                teamId: req.params.teamId,
+            },
+            {
+                $set: { "finalmapChoice": "Temple" },
+            }
+        );
+
         res.status(201).json(
             {
                 message: "Map Choice Saved: Success",

@@ -12,6 +12,10 @@ const roundOneSchema = mongoose.Schema(
             type: String,
         },
 
+        finalmapChoice: {
+            type: String,
+        },
+
         roundoneScore: {
             type: Number,
         },
@@ -32,6 +36,10 @@ const roundOneSchema = mongoose.Schema(
 
         roundthreeBalance: {
             type: Number
+        },
+
+        roundthreeDone: {
+            type: Boolean
         },
 
         totalScore: {
