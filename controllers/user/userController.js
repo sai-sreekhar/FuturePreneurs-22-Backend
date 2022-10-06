@@ -300,12 +300,24 @@ exports.hasFilledDetails = catchAsync(async (req, res, next) => {
   });
 
   if (!ticket) {
-    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
+    return next(
+      new AppError(
+        "Please SignOut and SignIn Again",
+        401,
+        errorCodes.INVALID_TOKEN
+      )
+    );
   }
 
   const { email } = ticket.getPayload();
   if (email !== emailFromClient) {
-    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
+    return next(
+      new AppError(
+        "Please SignOut and SignIn Again",
+        401,
+        errorCodes.INVALID_TOKEN
+      )
+    );
   }
 
   const user = await User.findOne({ email: emailFromClient });
@@ -540,10 +552,11 @@ exports.getTeam = catchAsync(async (req, res, next) => {
       regNo: 1,
       mobileNumber: 1,
       teamRole: 1,
+      isQualified: 1,
     }
   ).populate({
     path: "teamId",
-    select: { teamName: 1 },
+    select: { teamName: 1, isTeamQualified: 1 },
     populate: {
       path: "members",
       model: "Users",
@@ -554,6 +567,7 @@ exports.getTeam = catchAsync(async (req, res, next) => {
         regNo: 1,
         mobileNumber: 1,
         teamRole: 1,
+        isQualified: 1,
       },
     },
   });
