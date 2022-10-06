@@ -19,6 +19,9 @@ const teamSchema = mongoose.Schema(
         ref: "Users",
       },
     ],
+    isTeamQualified: {
+      type: Boolean,
+    },
   },
   { collection: "Teams" }
 );

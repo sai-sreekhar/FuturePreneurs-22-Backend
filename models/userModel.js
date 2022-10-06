@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema(
     teamRole: {
       type: Number,
     },
+    isQualified: {
+      type: Boolean,
+    },
     date: {
       type: Date,
       default: Date.now(),
