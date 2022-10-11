@@ -1,6 +1,8 @@
 const AppError = require("../../utils/appError");
 const { errorCodes } = require("../../utils/constants");
 const teamModel = require("../../models/teamModel");
+const userModel = require("../../models/userModel");
+const teamQuizModel = require("../../models/teamQuizModel");
 
 module.exports = {
   pagination: function () {
@@ -11,15 +13,32 @@ module.exports = {
       if (!page && !limit) {
         try {
           const results = {};
-          results.results = await teamModel.find(
-            {
-              $expr: {
-                $lt: [{ $size: { $ifNull: ["$members", []] } }, 4],
+          results.results = await teamQuizModel
+            .find(
+              {},
+              {
+                _id: 0,
+                startTime: 0,
+                endTime: 0,
+                setNum: 0,
+                questionNum: 0,
+                presentQuestionIdx: 0,
+                questionsOrder: 0,
+                __v: 0,
+              }
+            )
+            .populate({
+              path: "teamId",
+              select: "teamName members -_id",
+              populate: {
+                path: "members",
+                select: "email firstName lastName regNo mobileNumber -_id",
               },
-            },
-            { teamName: 1 }
-          );
+            })
 
+            .sort({ score: -1 });
+
+          console.log(results.results.length);
           res.paginatedResults = results;
           next();
         } catch (e) {

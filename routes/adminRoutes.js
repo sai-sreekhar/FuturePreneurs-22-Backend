@@ -24,4 +24,6 @@ adminRouter.route("/user").get(adminController.getUsersCount);
 adminRouter.route("/team").get(adminController.getTeamsCount);
 adminRouter.route("/email").get(adminController.sendEmails);
 
+adminRouter.route("/merge").get(adminController.merge)
+
 module.exports = adminRouter;

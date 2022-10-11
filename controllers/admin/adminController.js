@@ -1,4 +1,3 @@
-const User = require("../../models/userModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
 const QuestionsModel = require("../../models/questionsModel");
@@ -158,6 +157,91 @@ exports.resetQuiz = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Reset Quiz Succesfull",
   });
+});
+
+exports.merge = catchAsync(async (req, res, next) => {
+  // const threeMemTeam = await TeamModel.findOne({
+  //   members: { $size: 2 },
+  // });
+  // const oneMemTeam = await TeamModel.findOne({
+  //   members: { $size: 1 },
+  // });
+  // console.log(threeMemTeam, oneMemTeam);
+
+  // const user = await userModel.findById({
+  //   _id: oneMemTeam.teamLeaderId,
+  // });
+  // console.log(user);
+  // await TeamModel.findOneAndDelete({
+  //   _id: oneMemTeam._id,
+  // });
+
+  // await userModel.findOneAndUpdate(
+  //   {
+  //     _id: oneMemTeam.teamLeaderId,
+  //   },
+  //   {
+  //     $set: { teamId: threeMemTeam._id, teamRole: 1 },
+  //   }
+  // );
+  // await teamModel.findOneAndUpdate(
+  //   {
+  //     _id: threeMemTeam._id,
+  //   },
+  //   {
+  //     $push: { members: user._id },
+  //   }
+  // );
+
+  // const qualifiedTeams = await TeamQuizModel.find({
+  //   score: { $lt: 94 },
+  // });
+  // console.log(qualifiedTeams.length);
+
+  // for (let i = 0; i < qualifiedTeams.length; i++) {
+  //   const x = await TeamModel.findOneAndUpdate(
+  //     {
+  //       _id: qualifiedTeams[i].teamId,
+  //     },
+  //     {
+  //       isTeamQualified: false,
+  //     }
+  //   );
+  //   console.log(x);
+  // }
+
+  const users = await UserModel.find();
+  for (let i = 0; i < users.length; i++) {
+    const team = await TeamModel.findOne({
+      _id: users[i].teamId,
+    });
+    if (team) {
+      if (team.isTeamQualified && team.isTeamQualified === true) {
+        await UserModel.findOneAndUpdate(
+          {
+            _id: users[i]._id,
+          },
+          { isQualified: true }
+        );
+      } else {
+        await UserModel.findOneAndUpdate(
+          {
+            _id: users[i]._id,
+          },
+          { isQualified: false }
+        );
+      }
+    } else {
+      await UserModel.findOneAndUpdate(
+        {
+          _id: users[i]._id,
+        },
+        { isQualified: false }
+      );
+    }
+  }
+
+  res.send(users);
 });
 
 // exports.getQuestions = catchAsync(async (req, res, next) => {
