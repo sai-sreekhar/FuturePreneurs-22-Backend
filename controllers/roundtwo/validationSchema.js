@@ -2,9 +2,9 @@ const Joi = require("joi");
 const { objectIdLength } = require("../../utils/constants");
 
 module.exports = {
-  roundOneValidationMapSchema: (body) => {
+  roundTwoBoxChoiceValidationSchema: (body) => {
     const Schema = Joi.object({
-      mapChoice: Joi.number().required(),
+      boxChoice: Joi.number().required(),
     });
     return Schema.validate(body);
   },

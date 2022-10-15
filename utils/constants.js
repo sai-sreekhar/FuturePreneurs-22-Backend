@@ -69,6 +69,10 @@ const errorCodes = {
   TEAM_NOT_QUALIFIED: 31,
   ROUND_ONE_NOT_DOUND: 32,
   ROUND_ONE_MAP_ALREADY_SUMBMTTED: 33,
+  ROUND_ONE_MAP_NOTSET: 34,
+  ROUND_TWO_ALREADY_STARTED: 35,
+  ROUND_TWO_NOT_DOUND: 36,
+  ROUND_TWO_BOX_ALREADY_SUBMITTED: 37,
 };
 
 const questionTypes = {
@@ -101,6 +105,8 @@ const objectIdLength = 24;
 const noOfQuestionsToAnswer = 41;
 const noOfSets = 3;
 
+const roundTwoScores = [[], [7, 8, 6, 3, 10, 9, 4, 5], []];
+
 module.exports = {
   loginType,
   teamRole,
@@ -113,5 +119,6 @@ module.exports = {
   quizStatusTypes,
   noOfSets,
   maps,
+  roundTwoScores
   // SESConfig,
 };

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const roundOneSchema = mongoose.Schema(
+const roundTwoSchema = mongoose.Schema(
   {
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -11,11 +11,11 @@ const roundOneSchema = mongoose.Schema(
       type: Number,
     },
 
-    finalMapChoice: {
+    boxChoice: {
       type: Number,
     },
 
-    roundOneScore: {
+    roundTwoScore: {
       type: Number,
     },
 
@@ -27,7 +27,7 @@ const roundOneSchema = mongoose.Schema(
     },
   },
 
-  { collection: "RoundOneModel" }
+  { collection: "RoundTwoModel" }
 );
 
-module.exports = mongoose.model("RoundOneModel", roundOneSchema);
+module.exports = mongoose.model("RoundTwoModel", roundTwoSchema);

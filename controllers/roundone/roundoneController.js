@@ -54,6 +54,15 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
       mapChoice: null,
       finalMapChoice: null,
     }).save();
+
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundOneStarted: true },
+      }
+    );
   }
 
   res.status(201).json({
@@ -135,6 +144,15 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
         $set: { finalMapChoice: maps.TEMPLE },
       }
     );
+
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundOneEnd: true },
+      }
+    );
     return next(
       new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
     );
@@ -151,7 +169,7 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
         teamId: req.params.teamId,
       },
       {
-        $set: { finalMapChoice: mapChoice, roundOneScore: 100 },
+        $set: { finalMapChoice: mapChoice, roundOneScore: 5 },
       }
     );
   }
@@ -170,6 +188,15 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
       }
     );
   }
+
+  await Team.findOneAndUpdate(
+    {
+      _id: req.params.teamId,
+    },
+    {
+      $set: { hasRoundOneEnd: true },
+    }
+  );
 
   res.status(201).json({
     message: "Map Choice Saved Sucessfully",
