@@ -9,44 +9,47 @@ const roundOneSchema = mongoose.Schema(
     },
 
     mapChoice: {
-      type: String,
-    },
-
-    finalmapChoice: {
-      type: String,
-    },
-
-    roundoneScore: {
       type: Number,
     },
 
-    roundtwoScore: {
+    finalMapChoice: {
       type: Number,
     },
 
-    roundthreeScore: {
+    roundOneScore: {
       type: Number,
     },
 
-    roundthreeItems: [
-      {
-        type: String,
-      },
-    ],
+    // roundtwoScore: {
+    //   type: Number,
+    // },
 
-    roundthreeBalance: {
-      type: Number,
-    },
+    // roundthreeScore: {
+    //   type: Number,
+    // },
 
-    roundthreeDone: {
-      type: Boolean,
-    },
+    // roundthreeItems: [
+    //   {
+    //     type: String,
+    //   },
+    // ],
 
-    totalScore: {
-      type: Number,
-    },
+    // roundthreeBalance: {
+    //   type: Number,
+    // },
+
+    // roundthreeDone: {
+    //   type: Boolean,
+    // },
+
+    // totalScore: {
+    //   type: Number,
+    // },
 
     startTime: {
+      type: Date,
+    },
+    endTime: {
       type: Date,
     },
   },

@@ -64,7 +64,11 @@ const errorCodes = {
   SAME_EXISTING_TEAMNAME: 26,
   UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
   ROUND_RESPONSE_ALREADY_SUBMITTED: 28,
-  INVALID_OPERATION_RESPONSE: 29
+  INVALID_OPERATION_RESPONSE: 29,
+  ROUND_ONE_ALREADY_STARTED: 30,
+  TEAM_NOT_QUALIFIED: 31,
+  ROUND_ONE_NOT_DOUND: 32,
+  ROUND_ONE_MAP_ALREADY_SUMBMTTED: 33,
 };
 
 const questionTypes = {
@@ -75,6 +79,15 @@ const questionTypes = {
   CASE_STUDY_MULTI: 4,
   DESCRIPTIVE: 5,
   IMAGE_QUESTION: 6,
+};
+
+const maps = {
+  TEMPLE: 0,
+  BEACH: 1,
+  TECHPARK: 2,
+  HOSPITAL: 3,
+  SCHOOL: 4,
+  NONE: 5,
 };
 
 // const SESConfig = {
@@ -99,5 +112,6 @@ module.exports = {
   questionTypes,
   quizStatusTypes,
   noOfSets,
+  maps,
   // SESConfig,
 };

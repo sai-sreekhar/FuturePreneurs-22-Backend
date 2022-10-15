@@ -21,7 +21,7 @@ exports.getDetails = catchAsync(async (req, res, next) => {
   }
 
   if (team.teamLeaderId.toString() !== req.user._id) {
-    return next(
+    return next( 
       new AppError(
         "User doesn't belong to the Team or User isn't a Leader",
         412,
@@ -42,6 +42,7 @@ exports.getDetails = catchAsync(async (req, res, next) => {
       )
     );
   }
+  
   console.log(roundThree.roundthreeItems);
   await RoundOneModel.findOneAndUpdate(
     {
