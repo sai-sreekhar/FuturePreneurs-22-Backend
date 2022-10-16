@@ -63,8 +63,18 @@ const errorCodes = {
   PENDING_REQUESTS_LIMIT_REACHED: 25,
   SAME_EXISTING_TEAMNAME: 26,
   UPDATE_TEAMNAME_LIMIT_EXCEEDED: 27,
-  ROUND_RESPONSE_ALREADY_SUBMITTED: 28,
-  INVALID_OPERATION_RESPONSE: 29
+  INVALID_OPERATION: 28,
+  TEAM_NOT_QUALIFIED: 29,
+  ROUND_ONE_NOT_STARTED: 30, //round one not started
+  ROUND_ONE_COMPLETED: 31, //round one completed
+  ROUND_TWO_COMPLETED: 32,
+  ROUND_THREE_COMPLETED: 33, //round three completed
+  BALANCE_EXCEEDED: 34,
+  ITEMS_LIMIT_REACHED: 35,
+  PREVIOUS_ROUNDS_NOT_DONE: 36,
+  ROUND_ONE_NOT_COMPLETED: 37, // round one not completed
+  ROUND_THREE_NOT_STARTED: 38, //round three not started
+  ROUND_TWO_NOT_STARTED: 39,
 };
 
 const questionTypes = {
@@ -77,6 +87,16 @@ const questionTypes = {
   IMAGE_QUESTION: 6,
 };
 
+const maps = {
+  TEMPLE: 0,
+  BEACH: 1,
+  TECHPARK: 2,
+  HOSPITAL: 3,
+  SCHOOL: 4,
+  NONE: 5,
+};
+
+const roundThreeAmount = [1500, 700, 800];
 // const SESConfig = {
 //   apiVersion: "2010-12-01",
 //   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
@@ -88,6 +108,15 @@ const objectIdLength = 24;
 const noOfQuestionsToAnswer = 41;
 const noOfSets = 3;
 
+const roundTwoScores = [
+  [3, 8, 9, 10, 4, 6, 7, 5],
+  [7, 8, 6, 3, 4, 10, 9, 5],
+  [3, 8, 9, 6, 10, 7, 5, 4],
+];
+const roundThreeOperations = {
+  ADD: 0,
+  DELETE: 1,
+};
 module.exports = {
   loginType,
   teamRole,
@@ -99,5 +128,9 @@ module.exports = {
   questionTypes,
   quizStatusTypes,
   noOfSets,
+  maps,
+  roundTwoScores,
+  roundThreeAmount,
+  roundThreeOperations,
   // SESConfig,
 };

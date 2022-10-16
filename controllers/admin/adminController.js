@@ -1,9 +1,13 @@
-const User = require("../../models/userModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
 const QuestionsModel = require("../../models/questionsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
 const AnswersModel = require("../../models/answersModel");
+const RoundThreeDataModel = require("../../models/roundThreeDataModel");
+const RoundOneModel = require("../../models/roundoneModel");
+const RoundTwoModel = require("../../models/roundtwoModel");
+const RoundThreeModel = require("../../models/roundthreeModel");
+
 const {
   errorCodes,
   teamRole,
@@ -158,6 +162,91 @@ exports.resetQuiz = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Reset Quiz Succesfull",
   });
+});
+
+exports.merge = catchAsync(async (req, res, next) => {
+  // const threeMemTeam = await TeamModel.findOne({
+  //   members: { $size: 2 },
+  // });
+  // const oneMemTeam = await TeamModel.findOne({
+  //   members: { $size: 1 },
+  // });
+  // console.log(threeMemTeam, oneMemTeam);
+
+  // const user = await userModel.findById({
+  //   _id: oneMemTeam.teamLeaderId,
+  // });
+  // console.log(user);
+  // await TeamModel.findOneAndDelete({
+  //   _id: oneMemTeam._id,
+  // });
+
+  // await userModel.findOneAndUpdate(
+  //   {
+  //     _id: oneMemTeam.teamLeaderId,
+  //   },
+  //   {
+  //     $set: { teamId: threeMemTeam._id, teamRole: 1 },
+  //   }
+  // );
+  // await teamModel.findOneAndUpdate(
+  //   {
+  //     _id: threeMemTeam._id,
+  //   },
+  //   {
+  //     $push: { members: user._id },
+  //   }
+  // );
+
+  // const qualifiedTeams = await TeamQuizModel.find({
+  //   score: { $lt: 94 },
+  // });
+  // console.log(qualifiedTeams.length);
+
+  // for (let i = 0; i < qualifiedTeams.length; i++) {
+  //   const x = await TeamModel.findOneAndUpdate(
+  //     {
+  //       _id: qualifiedTeams[i].teamId,
+  //     },
+  //     {
+  //       isTeamQualified: false,
+  //     }
+  //   );
+  //   console.log(x);
+  // }
+
+  const users = await UserModel.find();
+  for (let i = 0; i < users.length; i++) {
+    const team = await TeamModel.findOne({
+      _id: users[i].teamId,
+    });
+    if (team) {
+      if (team.isTeamQualified && team.isTeamQualified === true) {
+        await UserModel.findOneAndUpdate(
+          {
+            _id: users[i]._id,
+          },
+          { isQualified: true }
+        );
+      } else {
+        await UserModel.findOneAndUpdate(
+          {
+            _id: users[i]._id,
+          },
+          { isQualified: false }
+        );
+      }
+    } else {
+      await UserModel.findOneAndUpdate(
+        {
+          _id: users[i]._id,
+        },
+        { isQualified: false }
+      );
+    }
+  }
+
+  res.send(users);
 });
 
 // exports.getQuestions = catchAsync(async (req, res, next) => {
@@ -437,3 +526,53 @@ exports.resetQuiz = catchAsync(async (req, res, next) => {
 //     teamQuizModel,
 //   });
 // });
+
+exports.roundThree = catchAsync(async (req, res, next) => {
+  // const admin = await User.findById({ _id: req.user._id });
+  // if (admin.teamRole !== teamRole.ADMIN) {
+  //   return next(
+  //     new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
+  //   );
+  // }
+
+  const x = await new RoundThreeDataModel({
+    item: req.body.item,
+    price: req.body.price,
+    mapChoice: req.body.mapChoice,
+    score: req.body.score,
+  }).save();
+
+  res.status(200).json({
+    message: "Set Successfully",
+    x,
+  });
+});
+
+exports.removeRoundsData = catchAsync(async (req, res, next) => {
+  // const admin = await User.findById({ _id: req.user._id });
+  // if (admin.teamRole !== teamRole.ADMIN) {
+  //   return next(
+  //     new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
+  //   );
+  // }
+
+  await RoundOneModel.deleteOne({ teamId: req.params.teamId });
+  await RoundTwoModel.deleteOne({ teamId: req.params.teamId });
+  await RoundThreeModel.deleteOne({ teamId: req.params.teamId });
+  await TeamModel.findOneAndUpdate(
+    { _id: req.params.teamId },
+    {
+      $set: {
+        hasRoundOneStarted: false,
+        hasRoundOneEnd: false,
+        hasRoundTwoStarted: false,
+        hasRoundTwoEnd: false,
+        hasRoundThreeStarted: false,
+        hasRoundThreeEnd: false,
+      },
+    }
+  );
+  res.status(200).json({
+    message: "Deleted Successfully",
+  });
+});

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const roundOneSchema = mongoose.Schema(
+const roundThreeSchema = mongoose.Schema(
   {
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -11,11 +11,17 @@ const roundOneSchema = mongoose.Schema(
       type: Number,
     },
 
-    finalMapChoice: {
+    items: [
+      {
+        type: String,
+      },
+    ],
+
+    balance: {
       type: Number,
     },
 
-    roundOneScore: {
+    roundThreeScore: {
       type: Number,
     },
 
@@ -27,7 +33,7 @@ const roundOneSchema = mongoose.Schema(
     },
   },
 
-  { collection: "RoundOneModel" }
+  { collection: "RoundThreeModel" }
 );
 
-module.exports = mongoose.model("RoundOneModel", roundOneSchema);
+module.exports = mongoose.model("RoundThreeModel", roundThreeSchema);

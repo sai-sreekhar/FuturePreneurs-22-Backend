@@ -22,6 +22,24 @@ const teamSchema = mongoose.Schema(
     isTeamQualified: {
       type: Boolean,
     },
+    hasRoundOneStarted: {
+      type: Boolean,
+    },
+    hasRoundOneEnd: {
+      type: Boolean,
+    },
+    hasRoundTwoStarted: {
+      type: Boolean,
+    },
+    hasRoundTwoEnd: {
+      type: Boolean,
+    },
+    hasRoundThreeStarted: {
+      type: Boolean,
+    },
+    hasRoundThreeEnd: {
+      type: Boolean,
+    },
   },
   { collection: "Teams" }
 );

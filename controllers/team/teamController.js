@@ -711,3 +711,53 @@ exports.getTeamToken = catchAsync(async (req, res, next) => {
     teamToken,
   });
 });
+
+exports.getRoundData = catchAsync(async (req, res, next) => {
+  if (req.params.teamId.length !== objectIdLength) {
+    return next(
+      new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
+    );
+  }
+
+  const team = await Team.findOne({ _id: req.params.teamId });
+
+  if (!team) {
+    return next(
+      new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
+    );
+  }
+
+  if (team.teamLeaderId.toString() !== req.user._id) {
+    return next(
+      new AppError(
+        "User doesn't belong to the Team or User isn't a Leader",
+        412,
+        errorCodes.INVALID_USERID_FOR_TEAMID_OR_USER_NOT_LEADER
+      )
+    );
+  }
+
+  if (!team.isTeamQualified) {
+    return next(
+      new AppError("Team is not qualified", 412, errorCodes.TEAM_NOT_QUALIFIED)
+    );
+  }
+
+  res.status(201).json({
+    message: "Round Data Of Team Sent Succesfully",
+    teamName: team.teamName,
+    isTeamQualified: team.isTeamQualified,
+    hasRoundOneStarted: team.hasRoundOneStarted
+      ? team.hasRoundOneStarted
+      : false,
+    hasRoundOneEnd: team.hasRoundOneEnd ? team.hasRoundOneEnd : false,
+    hasRoundTwoStarted: team.hasRoundTwoStarted
+      ? team.hasRoundTwoStarted
+      : false,
+    hasRoundTwoEnd: team.hasRoundTwoEnd ? team.hasRoundTwoEnd : false,
+    hasRoundThreeStarted: team.hasRoundThreeStarted
+      ? team.hasRoundThreeStarted
+      : false,
+    hasRoundThreeEnd: team.hasRoundThreeEnd ? team.hasRoundThreeEnd : false,
+  });
+});
