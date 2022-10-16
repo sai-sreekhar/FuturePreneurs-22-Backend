@@ -153,7 +153,11 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
   let roundTwo = await RoundTwoModel.findOne({ teamId: req.params.teamId });
   if (!team.hasRoundTwoStarted) {
     return next(
-      new AppError("Round Two Not Started", 412, errorCodes.ROUND_TWO_NOT_STARTED)
+      new AppError(
+        "Round Two Not Started",
+        412,
+        errorCodes.ROUND_TWO_NOT_STARTED
+      )
     );
   }
 
