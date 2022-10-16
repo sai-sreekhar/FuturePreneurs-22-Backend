@@ -96,7 +96,7 @@ const maps = {
   NONE: 5,
 };
 
-const roundThreeAmount = [1500, 700, 800];
+const roundThreeAmount = [7000, 8000, 6000];
 // const SESConfig = {
 //   apiVersion: "2010-12-01",
 //   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
