@@ -38,13 +38,11 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
   if (roundOne) {
-    return next(
-      new AppError(
-        "Round One Already Started",
-        412,
-        errorCodes.ROUND_ONE_ALREADY_STARTED
-      )
-    );
+    res.status(201).json({
+      message: "Round One Already Started Succesfully",
+      startTime: roundOne.startTime,
+      endTime: roundOne.endTime,
+    });
   } else {
     roundOne = await new RoundOneModel({
       teamId: req.params.teamId,
