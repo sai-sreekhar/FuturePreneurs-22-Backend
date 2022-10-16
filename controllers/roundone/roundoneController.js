@@ -84,13 +84,12 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
         $set: { hasRoundOneStarted: true },
       }
     );
+    res.status(201).json({
+      message: "Round One Started Succesfully",
+      startTime: roundOne.startTime,
+      endTime: roundOne.endTime,
+    });
   }
-
-  res.status(201).json({
-    message: "Round One Started Succesfully",
-    startTime: roundOne.startTime,
-    endTime: roundOne.endTime,
-  });
 });
 
 exports.submitSelection = catchAsync(async (req, res, next) => {
@@ -279,7 +278,7 @@ exports.getMap = catchAsync(async (req, res, next) => {
   });
 
   res.status(201).json({
-    message: "Map Choice Saved Sucessfully",
+    message: "Map Choice Sent Sucessfully",
     mapChoice: roundOne.finalMapChoice,
   });
 });

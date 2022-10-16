@@ -73,6 +73,10 @@ const errorCodes = {
   ROUND_TWO_ALREADY_STARTED: 35,
   ROUND_TWO_NOT_DOUND: 36,
   ROUND_TWO_BOX_ALREADY_SUBMITTED: 37,
+  ROUND_THREE_RES_SUBMITTED_ALREADY: 38,
+  ROUND_THREE_DOCUMENT_NOT_FOUND: 39,
+  BALANCE_EXCEEDED: 40,
+  ITEMS_LIMIT_REACHED: 41,
 };
 
 const questionTypes = {
@@ -94,6 +98,7 @@ const maps = {
   NONE: 5,
 };
 
+const roundThreeAmount = [1500, 700, 800];
 // const SESConfig = {
 //   apiVersion: "2010-12-01",
 //   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
@@ -105,8 +110,15 @@ const objectIdLength = 24;
 const noOfQuestionsToAnswer = 41;
 const noOfSets = 3;
 
-const roundTwoScores = [[], [7, 8, 6, 3, 10, 9, 4, 5], []];
-
+const roundTwoScores = [
+  [3, 8, 9, 10, 4, 6, 7, 5],
+  [7, 8, 6, 3, 4, 10, 9, 5],
+  [3, 8, 9, 6, 10, 7, 5, 4],
+];
+const roundThreeOperations = {
+  ADD: 0,
+  DELETE: 1,
+};
 module.exports = {
   loginType,
   teamRole,
@@ -119,6 +131,8 @@ module.exports = {
   quizStatusTypes,
   noOfSets,
   maps,
-  roundTwoScores
+  roundTwoScores,
+  roundThreeAmount,
+  roundThreeOperations,
   // SESConfig,
 };

@@ -1,11 +1,18 @@
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
 const RoundOneModel = require("../../models/roundoneModel");
+const RoundThreeModel = require("../../models/roundthreeModel");
+const RoundThreeDataModel = require("../../models/roundThreeDataModel");
 const Team = require("../../models/teamModel");
-const { errorCodes, objectIdLength } = require("../../utils/constants");
-const { roundThreeValidationVerifySchema } = require("./validationSchema");
+const {
+  errorCodes,
+  objectIdLength,
+  roundThreeAmount,
+  roundThreeOperations,
+} = require("../../utils/constants");
+const { roundThreeValidationSchema } = require("./validationSchema");
 
-exports.getDetails = catchAsync(async (req, res, next) => {
+exports.startRoundThree = catchAsync(async (req, res, next) => {
   if (req.params.teamId.length !== objectIdLength) {
     return next(
       new AppError("Invalid TeamId", 412, errorCodes.INVALID_TEAM_ID)
@@ -21,7 +28,7 @@ exports.getDetails = catchAsync(async (req, res, next) => {
   }
 
   if (team.teamLeaderId.toString() !== req.user._id) {
-    return next( 
+    return next(
       new AppError(
         "User doesn't belong to the Team or User isn't a Leader",
         412,
@@ -30,407 +37,75 @@ exports.getDetails = catchAsync(async (req, res, next) => {
     );
   }
 
-  let mapChoice;
+  if (!team.isTeamQualified) {
+    return next(
+      new AppError("Team is not qualified", 412, errorCodes.TEAM_NOT_QUALIFIED)
+    );
+  }
 
-  let roundThree = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (roundThree?.roundthreeDone === true) {
+  let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
+  if (!roundOne && !roundOne.finalMapChoice) {
     return next(
       new AppError(
-        "Response was already recieved and saved for this round.",
+        "Round One Map Not Set",
         412,
-        errorCodes.ROUND_RESPONSE_ALREADY_SUBMITTED
+        errorCodes.ROUND_ONE_MAP_NOTSET
       )
     );
   }
-  
-  console.log(roundThree.roundthreeItems);
-  await RoundOneModel.findOneAndUpdate(
-    {
-      teamId: req.params.teamId,
-    },
-    {
-      $set: { roundthreeBalance: 5000 },
-    }
+
+  const roundThreeData = await RoundThreeDataModel.find(
+    {},
+    { _id: 0, mapChoice: 0, score: 0, __v: 0 }
   );
 
-  mapChoice = roundThree.finalmapChoice;
+  let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
+  if (roundThree) {
+    if (roundThree.endTime < Date.now()) {
+      return next(
+        new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
+      );
+    } else {
+      res.status(201).json({
+        message: "Round Three Already Started Succesfully",
+        startTime: roundThree.startTime,
+        endTime: roundThree.endTime,
+        mapChoice: roundThree.mapChoice,
+        roundThreeData,
+        balance: roundThree.balance,
+      });
+    }
+  } else {
+    roundThree = await new RoundThreeModel({
+      teamId: req.params.teamId,
+      startTime: Date.now(),
+      endTime: Date.now() + 300000,
+      mapChoice: roundOne.finalMapChoice,
+      balance: roundThreeAmount[roundOne.finalMapChoice],
+    }).save();
 
-  if (mapChoice === "Temple") {
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundThreeStarted: true },
+      }
+    );
+
     res.status(201).json({
-      ammenities: [
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-      ],
-      availableBalance: `${roundThree.roundthreeBalance}`,
-      selectedItems: `${roundThree.roundthreeItems}`,
-    });
-  }
-  if (mapChoice === "Beach") {
-    res.status(201).json({
-      ammenities: [
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-      ],
-      availableBalance: `${roundThree.roundthreeBalance}`,
-      selectedItems: `${roundThree.roundthreeItems}`,
-    });
-  }
-  if (mapChoice === "Tech-Park") {
-    res.status(201).json({
-      ammenities: [
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-        {
-          name: "a",
-          price: 100,
-        },
-      ],
-      availableBalance: `${roundThree.roundthreeBalance}`,
-      selectedItems: `${roundThree.roundthreeItems}`,
+      message: "Round Three Started Succesfully",
+      startTime: roundThree.startTime,
+      endTime: roundThree.endTime,
+      mapChoice: roundThree.mapChoice,
+      roundThreeData,
+      balance: roundThree.balance,
     });
   }
 });
 
-exports.verifyOption = catchAsync(async (req, res, next) => {
-  const { error } = roundThreeValidationVerifySchema(req.body);
+exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
+  const { error } = roundThreeValidationSchema(req.body);
   if (error) {
     return next(
       new AppError(
@@ -464,22 +139,46 @@ exports.verifyOption = catchAsync(async (req, res, next) => {
     );
   }
 
-  let roundThree = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (roundThree.roundThreeDone === 1) {
+  if (!team.isTeamQualified) {
+    return next(
+      new AppError("Team is not qualified", 412, errorCodes.TEAM_NOT_QUALIFIED)
+    );
+  }
+
+  if (team.hasRoundThreeEnd) {
     return next(
       new AppError(
-        "Response was already recieved and saved for this round.",
+        "Round Three Response Submitted Already",
         412,
-        errorCodes.ROUND_RESPONSE_ALREADY_SUBMITTED
+        errorCodes.ROUND_THREE_RES_SUBMITTED_ALREADY
       )
+    );
+  }
+
+  let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
+  if (!roundThree) {
+    return next(
+      new AppError(
+        "Round Three Document Not Found",
+        412,
+        errorCodes.ROUND_THREE_DOCUMENT_NOT_FOUND
+      )
+    );
+  }
+
+  if (roundThree.endTime < Date.now()) {
+    return next(
+      new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
     );
   }
 
   let operation = req.body.operation;
   let item = req.body.item;
-  let price = req.body.price;
 
-  if (operation != "Add" && operation != "Delete") {
+  if (
+    operation != roundThreeOperations.ADD &&
+    operation != roundThreeOperations.DELETE
+  ) {
     return next(
       new AppError(
         "Operation is invalid",
@@ -489,50 +188,54 @@ exports.verifyOption = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (operation === "Add") {
-    if (price > roundThree.roundthreeBalance) {
-      res.status(201).json({
-        message: "No sufficient balance.",
-      });
+  const itemData = await RoundThreeDataModel.findOne({ item: item });
+  console.log(itemData);
+  let score = 0;
+  if (itemData.mapChoice === roundThree.mapChoice) {
+    score = itemData.score;
+  }
+
+  if (operation === roundThreeOperations.ADD) {
+    if (roundThree.items && roundThree.items.length === 10) {
+      return next(
+        new AppError("Items Limit Reached", 412, errorCodes.ITEMS_LIMIT_REACHED)
+      );
     }
-    if (price < roundThree.roundthreeBalance) {
-      console.log("Second");
-      await RoundOneModel.findOneAndUpdate(
+
+    if (itemData.price > roundThree.balance) {
+      return next(
+        new AppError("Balance Exceeded", 412, errorCodes.BALANCE_EXCEEDED)
+      );
+    } else {
+      await RoundThreeModel.findOneAndUpdate(
         {
           teamId: req.params.teamId,
         },
         {
-          $push: { roundthreeItems: item },
-          $inc: { roundthreeBalance: -price },
+          $push: { items: itemData.item },
+          $inc: { balance: -itemData.price, roundThreeScore: score },
         }
       );
 
-      roundThreeUpdated = await RoundOneModel.findOne({
-        teamId: req.params.teamId,
-      });
       res.status(201).json({
         message: "Item added successfully.",
-        availableBalance: `${roundThreeUpdated.roundthreeBalance}`,
+        availableBalance: roundThree.balance - itemData.price,
       });
     }
-  } else if (operation === "Delete") {
-    await RoundOneModel.findOneAndUpdate(
+  } else if (operation === roundThreeOperations.DELETE) {
+    await RoundThreeModel.findOneAndUpdate(
       {
         teamId: req.params.teamId,
       },
       {
-        $pull: { roundthreeItems: item },
-        $inc: { roundthreeBalance: price },
+        $pull: { items: itemData.item },
+        $inc: { balance: itemData.price, roundThreeScore: -score },
       }
     );
 
-    roundThreeUpdated = await RoundOneModel.findOne({
-      teamId: req.params.teamId,
-    });
-
     res.status(201).json({
       message: "Item deleted successfully",
-      availableBalance: `${roundThreeUpdated.roundthreeBalance}`,
+      availableBalance: roundThree.balance + itemData.price,
     });
   }
 });
@@ -562,16 +265,49 @@ exports.submitRound = catchAsync(async (req, res, next) => {
     );
   }
 
-  await RoundOneModel.findOneAndUpdate(
+  if (!team.isTeamQualified) {
+    return next(
+      new AppError("Team is not qualified", 412, errorCodes.TEAM_NOT_QUALIFIED)
+    );
+  }
+
+  if (!team.hasRoundThreeEnd) {
+    return next(
+      new AppError(
+        "Round Three Response Submitted Already",
+        412,
+        errorCodes.ROUND_THREE_RES_SUBMITTED_ALREADY
+      )
+    );
+  }
+
+  let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
+  if (!roundThree) {
+    return next(
+      new AppError(
+        "Round Three Document Not Found",
+        412,
+        errorCodes.ROUND_THREE_DOCUMENT_NOT_FOUND
+      )
+    );
+  }
+
+  if (roundThree.endTime < Date.now()) {
+    return next(
+      new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
+    );
+  }
+
+  await Team.findOneAndUpdate(
     {
       teamId: req.params.teamId,
     },
     {
-      $set: { roundthreeDone: 1 },
+      $set: { hasRoundThreeEnd: true },
     }
   );
 
   res.status(201).json({
-    message: "Round Submitted successfully.",
+    message: "Round Three Submitted successfully.",
   });
 });

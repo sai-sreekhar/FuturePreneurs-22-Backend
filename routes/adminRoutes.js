@@ -26,4 +26,6 @@ adminRouter.route("/email").get(adminController.sendEmails);
 
 adminRouter.route("/merge").get(adminController.merge)
 
+adminRouter.route("/roundThree").post(adminController.roundThree)
+
 module.exports = adminRouter;

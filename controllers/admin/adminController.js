@@ -3,6 +3,7 @@ const catchAsync = require("../../utils/catchAsync");
 const QuestionsModel = require("../../models/questionsModel");
 const TeamQuizModel = require("../../models/teamQuizModel");
 const AnswersModel = require("../../models/answersModel");
+const RoundThreeDataModel = require("../../models/roundThreeDataModel");
 const {
   errorCodes,
   teamRole,
@@ -521,3 +522,24 @@ exports.merge = catchAsync(async (req, res, next) => {
 //     teamQuizModel,
 //   });
 // });
+
+exports.roundThree = catchAsync(async (req, res, next) => {
+  // const admin = await User.findById({ _id: req.user._id });
+  // if (admin.teamRole !== teamRole.ADMIN) {
+  //   return next(
+  //     new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
+  //   );
+  // }
+
+  const x = await new RoundThreeDataModel({
+    item: req.body.item,
+    price: req.body.price,
+    mapChoice: req.body.mapChoice,
+    score: req.body.score,
+  }).save();
+
+  res.status(200).json({
+    message: "Set Successfully",
+    x
+  });
+});
