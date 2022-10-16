@@ -66,7 +66,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
 
   const roundThreeData = await RoundThreeDataModel.find(
     {},
-    { _id: 0, mapChoice: 0, score: 0, __v: 0 }
+    {mapChoice: 0, score: 0, __v: 0 }
   );
 
   let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
