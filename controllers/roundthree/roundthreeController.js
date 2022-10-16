@@ -44,7 +44,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne && !roundOne.finalMapChoice) {
+  if (!roundOne || !roundOne.finalMapChoice) {
     return next(
       new AppError(
         "Round One Map Not Set",
@@ -271,7 +271,7 @@ exports.submitRound = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (!team.hasRoundThreeEnd) {
+  if (team.hasRoundThreeEnd) {
     return next(
       new AppError(
         "Round Three Response Submitted Already",
@@ -293,6 +293,14 @@ exports.submitRound = catchAsync(async (req, res, next) => {
   }
 
   if (roundThree.endTime < Date.now()) {
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundThreeEnd: true },
+      }
+    );
     return next(
       new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
     );
@@ -300,7 +308,7 @@ exports.submitRound = catchAsync(async (req, res, next) => {
 
   await Team.findOneAndUpdate(
     {
-      teamId: req.params.teamId,
+      _id: req.params.teamId,
     },
     {
       $set: { hasRoundThreeEnd: true },
