@@ -284,7 +284,7 @@ exports.submitRound = catchAsync(async (req, res, next) => {
   if (team.hasRoundThreeEnd) {
     return next(
       new AppError(
-        "Round Three Response Submitted Already",
+        "Round Three Completed",
         412,
         errorCodes.ROUND_THREE_COMPLETED
       )
