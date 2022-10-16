@@ -66,7 +66,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
 
   const roundThreeData = await RoundThreeDataModel.find(
     {},
-    {mapChoice: 0, score: 0, __v: 0 }
+    { _id: 0, mapChoice: 0, score: 0, __v: 0 }
   );
 
   let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
@@ -190,11 +190,7 @@ exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
     operation != roundThreeOperations.DELETE
   ) {
     return next(
-      new AppError(
-        "Operation is invalid",
-        412,
-        errorCodes.INVALID_OPERATION
-      )
+      new AppError("Operation is invalid", 412, errorCodes.INVALID_OPERATION)
     );
   }
 
