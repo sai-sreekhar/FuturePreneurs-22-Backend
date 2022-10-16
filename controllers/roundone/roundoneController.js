@@ -38,11 +38,34 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
   if (roundOne) {
-    res.status(201).json({
-      message: "Round One Already Started Succesfully",
-      startTime: roundOne.startTime,
-      endTime: roundOne.endTime,
-    });
+    if (roundOne.endTime < Date.now()) {
+      await RoundOneModel.findOneAndUpdate(
+        {
+          teamId: req.params.teamId,
+        },
+        {
+          $set: { finalMapChoice: maps.TEMPLE, roundOneScore: 0 },
+        }
+      );
+
+      await Team.findOneAndUpdate(
+        {
+          _id: req.params.teamId,
+        },
+        {
+          $set: { hasRoundOneEnd: true },
+        }
+      );
+      return next(
+        new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
+      );
+    } else {
+      res.status(201).json({
+        message: "Round One Already Started Succesfully",
+        startTime: roundOne.startTime,
+        endTime: roundOne.endTime,
+      });
+    }
   } else {
     roundOne = await new RoundOneModel({
       teamId: req.params.teamId,
