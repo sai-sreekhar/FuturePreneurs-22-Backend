@@ -746,6 +746,7 @@ exports.getRoundData = catchAsync(async (req, res, next) => {
   res.status(201).json({
     message: "Round Data Of Team Sent Succesfully",
     teamName: team.teamName,
+    isTeamQualified: team.isTeamQualified,
     hasRoundOneStarted: team.hasRoundOneStarted
       ? team.hasRoundOneStarted
       : false,
