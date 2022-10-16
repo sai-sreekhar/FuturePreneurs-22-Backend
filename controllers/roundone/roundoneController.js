@@ -50,7 +50,7 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
       teamId: req.params.teamId,
       startTime: Date.now(),
       endTime: Date.now() + 180000,
-      roundOneScore: 0,
+      roundOneScore: null,
       mapChoice: null,
       finalMapChoice: null,
     }).save();
@@ -141,7 +141,7 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
         teamId: req.params.teamId,
       },
       {
-        $set: { finalMapChoice: maps.TEMPLE },
+        $set: { finalMapChoice: maps.TEMPLE, roundOneScore: 0 },
       }
     );
 
@@ -169,7 +169,11 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
         teamId: req.params.teamId,
       },
       {
-        $set: { finalMapChoice: mapChoice, roundOneScore: 5 },
+        $set: {
+          mapChoice: mapChoice,
+          finalMapChoice: mapChoice,
+          roundOneScore: 5,
+        },
       }
     );
   }
@@ -184,7 +188,11 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
         teamId: req.params.teamId,
       },
       {
-        $set: { finalMapChoice: maps.TEMPLE },
+        $set: {
+          mapChoice: mapChoice,
+          finalMapChoice: maps.TEMPLE,
+          roundOneScore: 0,
+        },
       }
     );
   }
