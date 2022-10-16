@@ -48,7 +48,7 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
       new AppError(
         "Round One Not Completed",
         412,
-        errorCodes.ROUND_ONE_NOT_COMPLETED
+        errorCodes.PREVIOUS_ROUNDS_NOT_DONE
       )
     );
   }
