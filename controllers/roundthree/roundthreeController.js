@@ -44,9 +44,23 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!team.hasRoundOneEnd) {
+  if (!team.hasRoundOneEnd || !team.hasRoundTwoEnd) {
     return next(
-      new AppError("Previous Rounds Not Completed", 412, errorCodes.PREVIOUS_ROUNDS_NOT_DONE)
+      new AppError(
+        "Previous Rounds Not Completed",
+        412,
+        errorCodes.PREVIOUS_ROUNDS_NOT_DONE
+      )
+    );
+  }
+
+  if (team.hasRoundThreeEnd) {
+    return next(
+      new AppError(
+        "Round Three Completed",
+        412,
+        errorCodes.ROUND_THREE_COMPLETED
+      )
     );
   }
 
@@ -144,20 +158,20 @@ exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
   if (team.hasRoundThreeEnd) {
     return next(
       new AppError(
-        "Round Three Response Submitted Already",
+        "Round Three Completed",
         412,
-        errorCodes.ROUND_THREE_RES_SUBMITTED_ALREADY
+        errorCodes.ROUND_THREE_COMPLETED
       )
     );
   }
 
   let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
-  if (!roundThree) {
+  if (!team.hasRoundThreeStarted) {
     return next(
       new AppError(
-        "Round Three Document Not Found",
+        "Round Three Not Started",
         412,
-        errorCodes.ROUND_THREE_DOCUMENT_NOT_FOUND
+        errorCodes.ROUND_THREE_NOT_STARTED
       )
     );
   }
@@ -272,18 +286,18 @@ exports.submitRound = catchAsync(async (req, res, next) => {
       new AppError(
         "Round Three Response Submitted Already",
         412,
-        errorCodes.ROUND_THREE_RES_SUBMITTED_ALREADY
+        errorCodes.ROUND_THREE_COMPLETED
       )
     );
   }
 
   let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
-  if (!roundThree) {
+  if (!team.hasRoundThreeStarted) {
     return next(
       new AppError(
-        "Round Three Document Not Found",
+        "Round Three Not Started",
         412,
-        errorCodes.ROUND_THREE_DOCUMENT_NOT_FOUND
+        errorCodes.ROUND_THREE_NOT_STARTED
       )
     );
   }

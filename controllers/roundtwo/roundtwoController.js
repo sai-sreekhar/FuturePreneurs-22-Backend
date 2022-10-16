@@ -53,6 +53,12 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (team.hasRoundTwoEnd) {
+    return next(
+      new AppError("Round 2 Completed", 412, errorCodes.ROUND_TWO_COMPLETED)
+    );
+  }
+
   let roundTwo = await RoundTwoModel.findOne({ teamId: req.params.teamId });
   if (roundTwo) {
     if (roundTwo.endTime < Date.now()) {
