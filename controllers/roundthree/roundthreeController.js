@@ -44,13 +44,9 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne || !roundOne.finalMapChoice) {
+  if (!team.hasRoundOneEnd) {
     return next(
-      new AppError(
-        "Round One Map Not Set",
-        412,
-        errorCodes.ROUND_ONE_MAP_NOTSET
-      )
+      new AppError("Previous Rounds Not Completed", 412, errorCodes.PREVIOUS_ROUNDS_NOT_DONE)
     );
   }
 
