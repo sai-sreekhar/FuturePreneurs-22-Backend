@@ -43,12 +43,12 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne || !roundOne.finalMapChoice){
+  if (!team.hasRoundOneEnd) {
     return next(
       new AppError(
-        "Round One Map Not Set",
+        "Round One Not Completed",
         412,
-        errorCodes.ROUND_ONE_MAP_NOTSET
+        errorCodes.ROUND_ONE_NOT_COMPLETED
       )
     );
   }
@@ -56,6 +56,14 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
   let roundTwo = await RoundTwoModel.findOne({ teamId: req.params.teamId });
   if (roundTwo) {
     if (roundTwo.endTime < Date.now()) {
+      await Team.findOneAndUpdate(
+        {
+          _id: req.params.teamId,
+        },
+        {
+          $set: { hasRoundTwoEnd: true },
+        }
+      );
       return next(
         new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
       );
@@ -137,27 +145,27 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
   }
 
   let roundTwo = await RoundTwoModel.findOne({ teamId: req.params.teamId });
-  if (!roundTwo) {
+  if (!team.hasRoundTwoStarted) {
     return next(
-      new AppError(
-        "Round Two Document Not Found",
-        412,
-        errorCodes.ROUND_TWO_NOT_DOUND
-      )
+      new AppError("Round Two Not Started", 412, errorCodes.ROUND_TWO_COMPLETED)
     );
   }
 
-  if (roundTwo.boxChoice) {
+  if (team.hasRoundTwoEnd) {
     return next(
-      new AppError(
-        "Round Two Box Choice Already Submitted",
-        412,
-        errorCodes.ROUND_TWO_BOX_ALREADY_SUBMITTED
-      )
+      new AppError("Round Two Completed", 412, errorCodes.ROUND_TWO_COMPLETED)
     );
   }
 
   if (roundTwo.endTime < Date.now()) {
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundTwoEnd: true },
+      }
+    );
     return next(
       new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
     );

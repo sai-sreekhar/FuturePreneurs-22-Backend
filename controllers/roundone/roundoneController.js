@@ -36,6 +36,12 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (team.hasRoundOneEnd) {
+    return next(
+      new AppError("Round 1 Completed", 412, errorCodes.ROUND_ONE_COMPLETED)
+    );
+  }
+
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
   if (roundOne) {
     if (roundOne.endTime < Date.now()) {
@@ -135,22 +141,22 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne) {
+  if (!team.hasRoundOneStarted) {
     return next(
       new AppError(
-        "Round One Document Not Found",
+        "Round One Not Started",
         412,
-        errorCodes.ROUND_ONE_NOT_DOUND
+        errorCodes.ROUND_ONE_NOT_STARTED
       )
     );
   }
 
-  if (roundOne.finalMapChoice) {
+  if (team.hasRoundOneEnd) {
     return next(
       new AppError(
-        "Round One Map Already Submitted",
+        "Round One Already Completed",
         412,
-        errorCodes.ROUND_ONE_MAP_ALREADY_SUMBMTTED
+        errorCodes.ROUND_ONE_COMPLETED
       )
     );
   }
@@ -263,12 +269,12 @@ exports.getMap = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne) {
+  if (!team.hasRoundOneStarted) {
     return next(
       new AppError(
-        "Round One Document Not Found",
+        "Round One Not Started",
         412,
-        errorCodes.ROUND_ONE_NOT_DOUND
+        errorCodes.ROUND_ONE_NOT_STARTED
       )
     );
   }
