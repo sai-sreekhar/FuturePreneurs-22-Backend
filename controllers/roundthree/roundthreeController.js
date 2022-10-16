@@ -66,7 +66,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
 
   const roundThreeData = await RoundThreeDataModel.find(
     {},
-    {mapChoice: 0, score: 0, __v: 0 }
+    { mapChoice: 0, score: 0, __v: 0 }
   );
 
   let roundThree = await RoundThreeModel.findOne({ teamId: req.params.teamId });
@@ -76,13 +76,23 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
         new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
       );
     } else {
+      await RoundThreeModel.findOneAndUpdate(
+        { teamId: req.params.teamId },
+        {
+          $set: {
+            balance: roundThreeAmount[roundOne.finalMapChoice],
+            roundThreeScore: 0,
+            items: [],
+          },
+        }
+      );
       res.status(201).json({
         message: "Round Three Already Started Succesfully",
         startTime: roundThree.startTime,
         endTime: roundThree.endTime,
         mapChoice: roundThree.mapChoice,
         roundThreeData,
-        balance: roundThree.balance,
+        balance: roundThreeAmount[roundOne.finalMapChoice],
       });
     }
   } else {
