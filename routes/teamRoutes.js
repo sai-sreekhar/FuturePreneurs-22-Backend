@@ -15,4 +15,6 @@ teamRouter.route("/requests/:teamId").patch(auth, teamController.updateRequest);
 teamRouter.route("/remove/:teamId").patch(auth, teamController.removeMember);
 teamRouter.route("/token/:teamId").get(auth, teamController.getTeamToken);
 
+teamRouter.route("/round/:teamId").get(auth, teamController.getRoundData);
+
 module.exports = teamRouter;
