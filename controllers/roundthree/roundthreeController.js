@@ -193,7 +193,7 @@ exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
       new AppError(
         "Operation is invalid",
         412,
-        errorCodes.INVALID_OPERATION_RESPONSE
+        errorCodes.INVALID_OPERATION
       )
     );
   }
