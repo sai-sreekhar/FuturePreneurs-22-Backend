@@ -55,13 +55,17 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
 
   let roundTwo = await RoundTwoModel.findOne({ teamId: req.params.teamId });
   if (roundTwo) {
-    return next(
-      new AppError(
-        "Round Two Already Started",
-        412,
-        errorCodes.ROUND_TWO_ALREADY_STARTED
-      )
-    );
+    if (roundTwo.endTime < Date.now()) {
+      return next(
+        new AppError("Time Limit Reached", 412, errorCodes.TIME_LIMIT_REACHED)
+      );
+    } else {
+      res.status(201).json({
+        message: "Round Two Already Started Succesfully",
+        startTime: roundTwo.startTime,
+        endTime: roundTwo.endTime,
+      });
+    }
   } else {
     roundTwo = await new RoundTwoModel({
       teamId: req.params.teamId,
@@ -71,21 +75,23 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
       mapChoice: roundOne.finalMapChoice,
       boxChoice: null,
     }).save();
-  }
 
-  await Team.findOneAndUpdate(
-    {
-      _id: req.params.teamId,
-    },
-    {
-      $set: { hasRoundTwoStarted: true },
-    }
-  );
-  res.status(201).json({
-    message: "Round Two Started Succesfully",
-    startTime: roundTwo.startTime,
-    endTime: roundTwo.endTime,
-  });
+    await Team.findOneAndUpdate(
+      {
+        _id: req.params.teamId,
+      },
+      {
+        $set: { hasRoundTwoStarted: true },
+      }
+    );
+
+    res.status(201).json({
+      message: "Round Two Started Succesfully",
+      startTime: roundTwo.startTime,
+      endTime: roundTwo.endTime,
+      mapChoice: roundOne.finalMapChoice,
+    });
+  }
 });
 
 exports.submitSelection = catchAsync(async (req, res, next) => {
