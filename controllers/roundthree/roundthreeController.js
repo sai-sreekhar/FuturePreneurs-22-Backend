@@ -99,7 +99,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
     roundThree = await new RoundThreeModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
-      endTime: Date.now() + 36000000,
+      endTime: Date.now() + 900000,
       mapChoice: roundOne.finalMapChoice,
       balance: roundThreeAmount[roundOne.finalMapChoice],
     }).save();

@@ -84,7 +84,7 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
     roundTwo = await new RoundTwoModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
-      endTime: Date.now() + 300000,
+      endTime: Date.now() + 600000,
       roundTwoScore: 0,
       mapChoice: roundOne.finalMapChoice,
       boxChoice: null,
