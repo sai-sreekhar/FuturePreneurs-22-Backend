@@ -43,7 +43,7 @@ exports.startRoundTwo = catchAsync(async (req, res, next) => {
   }
 
   let roundOne = await RoundOneModel.findOne({ teamId: req.params.teamId });
-  if (!roundOne && !roundOne.finalMapChoice) {
+  if (!roundOne || !roundOne.finalMapChoice){
     return next(
       new AppError(
         "Round One Map Not Set",
