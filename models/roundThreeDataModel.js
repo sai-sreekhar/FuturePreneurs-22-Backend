@@ -17,6 +17,10 @@ const roundThreeDataSchema = mongoose.Schema(
     score: {
       type: Number,
     },
+
+    isLeft: {
+      type: Boolean,
+    },
   },
 
   { collection: "RoundThreeDataModel" }
