@@ -69,6 +69,8 @@ app.use("/api/team/quiz", require("./routes/quizRoutes"));
 app.use("/api/team/roundone", require("./routes/roundoneRoutes"));
 app.use("/api/team/roundtwo", require("./routes/roundtwoRoutes"));
 app.use("/api/team/roundthree", require("./routes/roundthreeRoutes"));
+app.use("/api/team/nextRounds", require("./routes/nextRoundRoutes"));
+
 //all invalid urls handled here
 app.all("*", (req, res, next) => {
   next(

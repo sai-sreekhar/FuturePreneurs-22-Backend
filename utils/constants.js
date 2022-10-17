@@ -96,7 +96,7 @@ const maps = {
   NONE: 5,
 };
 
-const roundThreeAmount = [1500, 700, 800];
+const roundThreeAmount = [7000, 8000, 6000];
 // const SESConfig = {
 //   apiVersion: "2010-12-01",
 //   accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
@@ -110,8 +110,8 @@ const noOfSets = 3;
 
 const roundTwoScores = [
   [3, 8, 9, 10, 4, 6, 7, 5],
-  [7, 8, 6, 3, 4, 10, 9, 5],
-  [3, 8, 9, 6, 10, 7, 5, 4],
+  [7, 8, 6, 3, 10, 9, 4, 5],
+  [3, 4, 9, 6, 10, 7, 8, 5],
 ];
 const roundThreeOperations = {
   ADD: 0,

@@ -76,7 +76,7 @@ exports.startRoundOne = catchAsync(async (req, res, next) => {
     roundOne = await new RoundOneModel({
       teamId: req.params.teamId,
       startTime: Date.now(),
-      endTime: Date.now() + 180000,
+      endTime: Date.now() + 420000,
       roundOneScore: null,
       mapChoice: null,
       finalMapChoice: null,

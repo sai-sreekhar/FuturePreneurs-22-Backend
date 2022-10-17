@@ -1,5 +1,4 @@
 const express = require("express");
-const { admin } = require("googleapis/build/src/apis/admin");
 const adminController = require("../controllers/admin/adminController");
 const auth = require("../middleware/authMiddleware");
 const adminRouter = express.Router();
