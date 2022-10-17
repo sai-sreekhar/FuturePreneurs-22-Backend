@@ -40,6 +40,10 @@ const teamSchema = mongoose.Schema(
     hasRoundThreeEnd: {
       type: Boolean,
     },
+
+    currentRound: {
+      type: Number,
+    },
   },
   { collection: "Teams" }
 );
