@@ -205,7 +205,7 @@ exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
   }
 
   const itemData = await RoundThreeDataModel.findOne({ item: item });
-  console.log(itemData);
+  // console.log(itemData);
   let score = 0;
   if (itemData.mapChoice === roundThree.mapChoice) {
     score = itemData.score;
