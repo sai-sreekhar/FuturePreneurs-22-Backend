@@ -759,5 +759,6 @@ exports.getRoundData = catchAsync(async (req, res, next) => {
       ? team.hasRoundThreeStarted
       : false,
     hasRoundThreeEnd: team.hasRoundThreeEnd ? team.hasRoundThreeEnd : false,
+    hasLastRoundEnd: team.hasLastRoundEnd ? team.hasLastRoundEnd : false
   });
 });
