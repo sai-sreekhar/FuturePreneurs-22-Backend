@@ -22,6 +22,7 @@ const UserModel = require("../../models/userModel");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const { transporter } = require("../../utils/nodemailer");
+const roundThreeDataModel = require("../../models/roundThreeDataModel");
 
 exports.getUsersCount = catchAsync(async (req, res, next) => {
   const users = await UserModel.find();
@@ -569,6 +570,11 @@ exports.removeRoundsData = catchAsync(async (req, res, next) => {
         hasRoundTwoEnd: false,
         hasRoundThreeStarted: false,
         hasRoundThreeEnd: false,
+        currentRound: null,
+        roundOneScore: 0,
+        roundTwoScore: 0,
+        roundThreeScore: 0,
+        totalScore: 0,
       },
     }
   );
