@@ -110,5 +110,6 @@ exports.setCurrRound = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     message: "Next Round Set Succesfully",
+    currentRound: req.body.nextRound,
   });
 });
