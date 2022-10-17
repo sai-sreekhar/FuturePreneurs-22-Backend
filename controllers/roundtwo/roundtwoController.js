@@ -198,7 +198,7 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
       _id: req.params.teamId,
     },
     {
-      $set: { hasRoundTwoEnd: true },
+      $set: { hasRoundTwoEnd: true, roundTwoScore: score },
     }
   );
 
