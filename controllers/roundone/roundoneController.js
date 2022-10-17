@@ -184,12 +184,14 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
     );
   }
 
+  let score = 0;
   const mapChoice = req.body.mapChoice;
   if (
     mapChoice === maps.TEMPLE ||
     mapChoice === maps.BEACH ||
     mapChoice === maps.TECHPARK
   ) {
+    score = 5;
     roundOne = await RoundOneModel.findOneAndUpdate(
       {
         teamId: req.params.teamId,
@@ -209,6 +211,7 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
     mapChoice === maps.SCHOOL ||
     mapChoice === maps.NONE
   ) {
+    score = 0;
     roundOne = await RoundOneModel.findOneAndUpdate(
       {
         teamId: req.params.teamId,
@@ -228,7 +231,7 @@ exports.submitSelection = catchAsync(async (req, res, next) => {
       _id: req.params.teamId,
     },
     {
-      $set: { hasRoundOneEnd: true },
+      $set: { hasRoundOneEnd: true, roundOneScore: score },
     }
   );
 
