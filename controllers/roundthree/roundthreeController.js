@@ -327,7 +327,7 @@ exports.submitRound = catchAsync(async (req, res, next) => {
       _id: req.params.teamId,
     },
     {
-      $set: { hasRoundThreeEnd: true },
+      $set: { hasRoundThreeEnd: true, currentRound: 20 },
     }
   );
 
