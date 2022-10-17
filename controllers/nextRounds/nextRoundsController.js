@@ -36,15 +36,15 @@ exports.getCurrRound = catchAsync(async (req, res, next) => {
     );
   }
 
-//   if (!team.hasRoundOneEnd || !team.hasRoundTwoEnd || !team.hasRoundThreeEnd) {
-//     return next(
-//       new AppError(
-//         "Previous Rounds Not Completed",
-//         412,
-//         errorCodes.PREVIOUS_ROUNDS_NOT_DONE
-//       )
-//     );
-//   }
+  if (!team.hasRoundOneEnd || !team.hasRoundTwoEnd || !team.hasRoundThreeEnd) {
+    return next(
+      new AppError(
+        "Previous Rounds Not Completed",
+        412,
+        errorCodes.PREVIOUS_ROUNDS_NOT_DONE
+      )
+    );
+  }
 
   res.status(201).json({
     message: "Current Round Sent Succesfully",
@@ -93,15 +93,15 @@ exports.setCurrRound = catchAsync(async (req, res, next) => {
     );
   }
 
-//   if (!team.hasRoundOneEnd || !team.hasRoundTwoEnd || !team.hasRoundThreeEnd) {
-//     return next(
-//       new AppError(
-//         "Previous Rounds Not Completed",
-//         412,
-//         errorCodes.PREVIOUS_ROUNDS_NOT_DONE
-//       )
-//     );
-//   }
+  if (!team.hasRoundOneEnd || !team.hasRoundTwoEnd || !team.hasRoundThreeEnd) {
+    return next(
+      new AppError(
+        "Previous Rounds Not Completed",
+        412,
+        errorCodes.PREVIOUS_ROUNDS_NOT_DONE
+      )
+    );
+  }
 
   await Team.findOneAndUpdate(
     { _id: req.params.teamId },
@@ -110,5 +110,6 @@ exports.setCurrRound = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     message: "Next Round Set Succesfully",
+    currentRound: req.body.nextRound,
   });
 });
