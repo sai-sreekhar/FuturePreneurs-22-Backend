@@ -102,6 +102,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
       endTime: Date.now() + 900000,
       mapChoice: roundOne.finalMapChoice,
       balance: roundThreeAmount[roundOne.finalMapChoice],
+      roundThreeScore: 0,
     }).save();
 
     await Team.findOneAndUpdate(
