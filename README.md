@@ -49,6 +49,8 @@ To run this project, you will need to add the following environment variables to
 
 `CLIENT_URL`
 
+`GOOGLE_CLIENT_ID`
+
 `ACCESS_TOKEN_SECRET`
 
 `REFRESH_TOKEN_SECRET`
