@@ -102,6 +102,7 @@ exports.startRoundThree = catchAsync(async (req, res, next) => {
       endTime: Date.now() + 900000,
       mapChoice: roundOne.finalMapChoice,
       balance: roundThreeAmount[roundOne.finalMapChoice],
+      roundThreeScore: 0,
     }).save();
 
     await Team.findOneAndUpdate(
@@ -205,7 +206,7 @@ exports.addOrDeleteItems = catchAsync(async (req, res, next) => {
   }
 
   const itemData = await RoundThreeDataModel.findOne({ item: item });
-  console.log(itemData);
+  // console.log(itemData);
   let score = 0;
   if (itemData.mapChoice === roundThree.mapChoice) {
     score = itemData.score;
@@ -314,7 +315,7 @@ exports.submitRound = catchAsync(async (req, res, next) => {
         _id: req.params.teamId,
       },
       {
-        $set: { hasRoundThreeEnd: true },
+        $set: { hasRoundThreeEnd: true, currentRound: 20 },
       }
     );
     return next(

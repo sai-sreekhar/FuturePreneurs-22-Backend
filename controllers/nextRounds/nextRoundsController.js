@@ -103,10 +103,17 @@ exports.setCurrRound = catchAsync(async (req, res, next) => {
     );
   }
 
-  await Team.findOneAndUpdate(
-    { _id: req.params.teamId },
-    { currentRound: req.body.nextRound }
-  );
+  if (req.body.nextRound === 28) {
+    await Team.findOneAndUpdate(
+      { _id: req.params.teamId },
+      { currentRound: req.body.nextRound, hasLastRoundEnd: true }
+    );
+  } else {
+    await Team.findOneAndUpdate(
+      { _id: req.params.teamId },
+      { currentRound: req.body.nextRound }
+    );
+  }
 
   res.status(201).json({
     message: "Next Round Set Succesfully",
