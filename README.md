@@ -35,6 +35,8 @@ Checkout my application's API Documentation at: https://documenter.getpostman.co
 I've hosted the backend-end app at: 
 https://api.saisreekar.live/
 
+Front-end app is hosted at: https://fp.ecellvit.com/
+
 ## Environment Variables for Client Side
 
 To run this project, you will need to add the following environment variables to your .env file
