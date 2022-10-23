@@ -40,6 +40,7 @@ Install dependencies
 ```
 
 To start the server it in development mode,
+
 ```bash
   node server.js
 ```
@@ -75,4 +76,3 @@ To run this project, you will need to add the following environment variables to
 `REFRESH_TOKEN_SECRET`
 
 `TEAM_TOKEN_SECRET`
-
