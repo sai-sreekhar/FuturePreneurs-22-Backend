@@ -3,7 +3,7 @@ const nextRoundController = require("../controllers/nextRounds/nextRoundsControl
 const auth = require("../middleware/authMiddleware");
 const nextRoundRouter = express.Router();
 
-nextRoundRouter.route("/:teamId").get(auth,nextRoundController.getCurrRound);
-nextRoundRouter.route("/:teamId").post(auth,nextRoundController.setCurrRound);
+nextRoundRouter.route("/:teamId").get(auth, nextRoundController.getCurrRound);
+nextRoundRouter.route("/:teamId").post(auth, nextRoundController.setCurrRound);
 
 module.exports = nextRoundRouter;
