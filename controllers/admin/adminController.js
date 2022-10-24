@@ -582,3 +582,38 @@ exports.removeRoundsData = catchAsync(async (req, res, next) => {
     message: "Deleted Successfully",
   });
 });
+
+exports.getScores = catchAsync(async (req, res, next) => {
+  // const admin = await User.findById({ _id: req.user._id });
+  // if (admin.teamRole !== teamRole.ADMIN) {
+  //   return next(
+  //     new AppError("Only Admins can access", 400, errorCodes.NOT_ADMIN)
+  //   );
+  // }
+  const teams = await TeamModel.find({
+    isTeamQualified: true,
+    hasRoundThreeEnd: true,
+  });
+  console.log(teams);
+  console.log(teams.length);
+  for (let i = 0; i < teams.length; i++) {
+    const x = teams[i];
+    let r1 = await RoundOneModel.findOne({ teamId: x._id });
+    let r2 = await RoundTwoModel.findOne({ teamId: x._id });
+    let r3 = await RoundThreeModel.findOne({ teamId: x._id });
+
+    let score1 = r1.roundOneScore ? r1.roundOneScore : 0;
+    let score2 = r2.roundTwoScore ? r2.roundTwoScore : 0;
+    let score3 = r3.roundThreeScore ? r3.roundThreeScore : 0;
+    let total = score1 + score2 + score3;
+    await TeamModel.findOneAndUpdate(
+      { _id: x._id },
+      { $set: { totalScore: total } }
+    );
+    console.log(total);
+  }
+
+  res.status(200).json({
+    message: "Done",
+  });
+});

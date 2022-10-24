@@ -36,12 +36,24 @@ exports.googleAuth = catchAsync(async (req, res, next) => {
   });
 
   if (!ticket) {
-    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
+    return next(
+      new AppError(
+        "Please SignOut and SignIn Again",
+        401,
+        errorCodes.INVALID_TOKEN
+      )
+    );
   }
 
   const { email } = ticket.getPayload();
   if (email !== emailFromClient) {
-    return next(new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN));
+    return next(
+      new AppError(
+        "Please SignOut and SignIn Again",
+        401,
+        errorCodes.INVALID_TOKEN
+      )
+    );
   }
 
   const user = await User.findOne({ email: emailFromClient });
@@ -200,7 +212,11 @@ exports.getNewAccessToken = catchAsync(async (req, res, next) => {
       });
     })
     .catch((err) => {
-      return new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN);
+      return new AppError(
+        "Please SignOut and SignIn Again",
+        401,
+        errorCodes.INVALID_TOKEN
+      );
     });
 });
 
@@ -218,7 +234,11 @@ exports.logout = catchAsync(async (req, res, next) => {
 
   const userToken = await UserToken.findOne({ token: req.body.refreshToken });
   if (!userToken) {
-    return new AppError("Please SignOut and SignIn Again", 401, errorCodes.INVALID_TOKEN);
+    return new AppError(
+      "Please SignOut and SignIn Again",
+      401,
+      errorCodes.INVALID_TOKEN
+    );
   }
   await userToken.remove();
   res.status(200).json({ message: "Logged Out Sucessfully" });
