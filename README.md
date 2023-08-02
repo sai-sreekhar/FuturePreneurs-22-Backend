@@ -28,6 +28,8 @@ This backend platform for FuturePreneurs 8.0, hosted over **1800** participants 
 [![Apache JMeter](https://img.shields.io/static/v1?style=for-the-badge&message=Apache+JMeter&color=D22128&logo=Apache+JMeter&logoColor=FFFFFF&label=)
 ](https://jmeter.apache.org/)
 
+## FEATURES
+
 ## Team Creation and Joining Phase
 
 Here the user can either choose to create a team as shown below:
